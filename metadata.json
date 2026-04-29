@@ -1,0 +1,7 @@
+{
+  "name": "LeadGen AI Pro",
+  "description": "A sophisticated AI-driven lead detection and qualification system that scours the web to find, qualify, and manage leads for your business niche.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
