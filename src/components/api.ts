@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Matches your Flask blueprint prefix
+  // baseURL: 'http://localhost:5000/api', // Matches your Flask blueprint prefix
+  baseURL: 'https://api.shahzadtradingcompany.com/api', // Matches your Flask blueprint prefix
 });
 
 // REQUEST Interceptor: Attach the token
