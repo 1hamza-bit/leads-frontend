@@ -2,21 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import {
-  Lead, Campaign, NicheIntel, User, PlanType, PLANS, QualificationCriteria,
-  LimitInfo
+  Lead, Campaign, NicheIntel, User, PlanType, PLANS, LimitInfo
 } from './types';
-import { discoverLeads, performDeepAudit, generateNicheIntel, verifyLeadContact } from './services/geminiService';
 import { useAuth } from './src/contexts/AuthContext';
 import CookieConsent from './src/components/CookieConsent';
 import PrivacyPolicy from './src/components/PrivacyPolicy';
 import TermsOfService from './src/components/TermsOfService';
 import {
-  RocketLaunchIcon, ExclamationTriangleIcon, BoltIcon, ArrowRightIcon, CpuChipIcon, SparklesIcon,
-  UserGroupIcon, MagnifyingGlassIcon, ArrowPathIcon, ShieldCheckIcon, GlobeAltIcon, EnvelopeIcon,
+  RocketLaunchIcon, ExclamationTriangleIcon, BoltIcon, CpuChipIcon, SparklesIcon,
+  MagnifyingGlassIcon, ArrowPathIcon, ShieldCheckIcon, GlobeAltIcon, EnvelopeIcon,
   LinkIcon, QueueListIcon, PlusIcon, CheckBadgeIcon, FingerPrintIcon,
-  BriefcaseIcon, FireIcon, CreditCardIcon, Cog6ToothIcon, ArrowLeftOnRectangleIcon,
-  KeyIcon, CircleStackIcon, ServerIcon, TrashIcon, CloudArrowDownIcon, ShieldExclamationIcon,
-  MapPinIcon, BeakerIcon, BuildingOfficeIcon, UserIcon, XCircleIcon, HandThumbDownIcon
+  BriefcaseIcon, CircleStackIcon, ArrowLeftOnRectangleIcon,
+  XCircleIcon, HandThumbDownIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import LoginInput from './src/components/login';
@@ -66,7 +63,7 @@ const NeuralGrid = () => (
   </div>
 );
 
-const NeuralToast = ({ message, onRemove }: { message: string; onRemove: () => void; key?: any }) => (
+const NeuralToast = ({ message, onRemove }: { message: string; onRemove: () => void }) => (
   <motion.div
     initial={{ opacity: 0, x: 100, scale: 0.9 }}
     animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -127,8 +124,8 @@ const CircularProgress = ({
   value: number; size?: number; strokeWidth?: number;
   label?: React.ReactNode; sublabel?: string; color?: string; isSpinning?: boolean;
 }) => {
-  const r = (size - strokeWidth) / 2;
-  const c = 2 * Math.PI * r;
+  const r   = (size - strokeWidth) / 2;
+  const c   = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
   const [animPct, setAnimPct] = useState(0);
   useEffect(() => { const t = setTimeout(() => setAnimPct(pct), 80); return () => clearTimeout(t); }, [pct]);
@@ -156,14 +153,14 @@ const CircularProgress = ({
 // ─── Email Status Badge ──────────────────────────────────────────────────────
 
 const EMAIL_STATUS: Record<string, { label: string; color: string; bg: string }> = {
-  verified: { label: 'Verified', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
-  probable: { label: 'Probable', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
-  mx_verified: { label: 'MX OK', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
-  catchall_server: { label: 'Catch-All', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
-  undeliverable: { label: 'Bad Email', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
-  no_mx_record: { label: 'No MX', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
-  invalid_format: { label: 'Invalid', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
-  disposable: { label: 'Disposable', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+  verified:        { label: 'Verified',   color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+  probable:        { label: 'Probable',   color: 'text-amber-400',   bg: 'bg-amber-500/10 border-amber-500/30'   },
+  mx_verified:     { label: 'MX OK',      color: 'text-blue-400',    bg: 'bg-blue-500/10 border-blue-500/30'     },
+  catchall_server: { label: 'Catch-All',  color: 'text-amber-400',   bg: 'bg-amber-500/10 border-amber-500/30'   },
+  undeliverable:   { label: 'Bad Email',  color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
+  no_mx_record:    { label: 'No MX',      color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
+  invalid_format:  { label: 'Invalid',    color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
+  disposable:      { label: 'Disposable', color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
 };
 
 const EmailStatusBadge = ({ status }: { status?: string }) => {
@@ -185,13 +182,13 @@ const WebsiteBadge = ({ isLive, httpStatus }: { isLive?: boolean; httpStatus?: n
 // ─── Source Badge ────────────────────────────────────────────────────────────
 
 const SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
-  vault: { label: 'Vault', color: 'text-slate-400 border-slate-600' },
-  google_search: { label: 'Google', color: 'text-blue-400 border-blue-600' },
-  facebook_graph: { label: 'Facebook', color: 'text-indigo-400 border-indigo-600' },
-  facebook_gemini: { label: 'Facebook', color: 'text-indigo-400 border-indigo-600' },
-  linkedin_signal: { label: 'LinkedIn', color: 'text-cyan-400 border-cyan-600' },
-  news_signal: { label: 'News', color: 'text-amber-400 border-amber-600' },
-  ai_search: { label: 'AI Search', color: 'text-violet-400 border-violet-600' },
+  vault:           { label: 'Vault',     color: 'text-slate-400 border-slate-600'   },
+  google_search:   { label: 'Google',    color: 'text-blue-400 border-blue-600'     },
+  facebook_graph:  { label: 'Facebook',  color: 'text-indigo-400 border-indigo-600' },
+  facebook_gemini: { label: 'Facebook',  color: 'text-indigo-400 border-indigo-600' },
+  linkedin_signal: { label: 'LinkedIn',  color: 'text-cyan-400 border-cyan-600'     },
+  news_signal:     { label: 'News',      color: 'text-amber-400 border-amber-600'   },
+  ai_search:       { label: 'AI Search', color: 'text-violet-400 border-violet-600' },
 };
 
 const SourceBadge = ({ source }: { source?: string }) => {
@@ -223,7 +220,6 @@ const ExhaustedMarketBanner = ({
         <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
           All known <span className="text-amber-400 font-bold">{niche}</span> leads in{' '}
           <span className="text-amber-400 font-bold">{city}</span> have been discovered.
-          Try expanding to a nearby city or a related niche.
         </p>
       </div>
     </div>
@@ -231,10 +227,8 @@ const ExhaustedMarketBanner = ({
       <div className="flex flex-wrap gap-2 pl-14">
         <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest self-center">Try nearby:</span>
         {suggestedCities.map(sc => (
-          <button
-            key={sc} onClick={() => onExpandCity(sc)}
-            className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-[10px] font-bold hover:bg-amber-500/10 hover:border-amber-500/30 hover:text-amber-400 transition-all"
-          >
+          <button key={sc} onClick={() => onExpandCity(sc)}
+            className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-[10px] font-bold hover:bg-amber-500/10 hover:border-amber-500/30 hover:text-amber-400 transition-all">
             {sc}
           </button>
         ))}
@@ -250,7 +244,7 @@ const RejectionModal = ({
 }: {
   leadId: string; onClose: () => void; onSuccess: (status: string) => void;
 }) => {
-  const [reason, setReason] = useState('');
+  const [reason, setReason]   = useState('');
   const [loading, setLoading] = useState(false);
 
   const submit = async (status: 'rejected' | 'qualified') => {
@@ -306,32 +300,167 @@ const RejectionModal = ({
   );
 };
 
+// ─── Deep Audit Result Panel ──────────────────────────────────────────────────
+// Shown inside the lead detail view after a successful deep audit API call.
+
+const DeepAuditPanel = ({ audit }: { audit: any }) => {
+  if (!audit) return null;
+
+  const dm       = audit.decision_maker;
+  const socials  = audit.social_profiles;
+  const signals  = audit.activity_signals || [];
+  const updates  = audit.update_summary   || [];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      className="mt-6 space-y-4"
+    >
+      {/* Summary */}
+      {audit.audit_summary && (
+        <div className="p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl">
+          <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-2">Audit Summary</p>
+          <p className="text-[11px] text-slate-300 leading-relaxed">{audit.audit_summary}</p>
+          {audit.source_notes && (
+            <p className="text-[10px] text-slate-600 mt-2 italic">{audit.source_notes}</p>
+          )}
+        </div>
+      )}
+
+      {/* Updates applied */}
+      {updates.length > 0 && (
+        <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
+          <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-2">Data Updated</p>
+          {updates.map((u: string, i: number) => (
+            <p key={i} className="text-[11px] text-emerald-300 leading-relaxed">✓ {u}</p>
+          ))}
+        </div>
+      )}
+
+      {/* Decision Maker */}
+      {dm?.name && (
+        <div className="p-4 bg-white/5 rounded-2xl flex items-start gap-4">
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-base font-black shrink-0">
+            {dm.name.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-bold text-sm">{dm.name}</p>
+            {dm.title && <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest">{dm.title}</p>}
+            {dm.email && <p className="text-[11px] text-slate-400 mt-1">{dm.email}</p>}
+            {dm.linkedin_url && (
+              <a href={dm.linkedin_url} target="_blank" rel="noreferrer"
+                className="text-[10px] text-cyan-400 hover:text-cyan-300 font-bold mt-1 block transition-colors">
+                LinkedIn Profile →
+              </a>
+            )}
+            {dm.note && <p className="text-[10px] text-slate-600 italic mt-1">{dm.note}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Alternative contacts */}
+      {(audit.contact_form_url || audit.whatsapp || audit.wechat_id) && (
+        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-2">
+          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Alternative Contacts</p>
+          {audit.contact_form_url && (
+            <a href={audit.contact_form_url} target="_blank" rel="noreferrer"
+              className="flex items-center gap-2 text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors">
+              <LinkIcon className="w-3.5 h-3.5 shrink-0" /> Contact Form
+            </a>
+          )}
+          {audit.whatsapp && (
+            <p className="flex items-center gap-2 text-[11px] text-emerald-400">
+              <span className="text-[10px]">📱</span> WhatsApp: {audit.whatsapp}
+            </p>
+          )}
+          {audit.wechat_id && (
+            <p className="flex items-center gap-2 text-[11px] text-slate-400">
+              <span className="text-[10px]">💬</span> WeChat: {audit.wechat_id}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Social profiles */}
+      {socials && Object.values(socials).some(Boolean) && (
+        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-2">
+          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Social Profiles</p>
+          {socials.linkedin_company && (
+            <a href={socials.linkedin_company} target="_blank" rel="noreferrer"
+              className="flex items-center gap-2 text-[11px] text-cyan-400 hover:text-cyan-300 transition-colors">
+              <LinkIcon className="w-3.5 h-3.5 shrink-0" /> LinkedIn Company
+            </a>
+          )}
+          {socials.facebook && (
+            <a href={socials.facebook} target="_blank" rel="noreferrer"
+              className="flex items-center gap-2 text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors">
+              <LinkIcon className="w-3.5 h-3.5 shrink-0" /> Facebook
+            </a>
+          )}
+          {socials.twitter && (
+            <a href={socials.twitter} target="_blank" rel="noreferrer"
+              className="flex items-center gap-2 text-[11px] text-slate-400 hover:text-white transition-colors">
+              <LinkIcon className="w-3.5 h-3.5 shrink-0" /> Twitter / X
+            </a>
+          )}
+          {(socials.alibaba || socials.made_in_china) && (
+            <a href={socials.alibaba || socials.made_in_china} target="_blank" rel="noreferrer"
+              className="flex items-center gap-2 text-[11px] text-amber-400 hover:text-amber-300 transition-colors">
+              <LinkIcon className="w-3.5 h-3.5 shrink-0" /> Trade Directory
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Activity signals */}
+      {signals.length > 0 && (
+        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-2">
+          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Activity Signals</p>
+          {signals.map((s: string, i: number) => (
+            <div key={i} className="flex items-start gap-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+              <p className="text-[11px] text-slate-400 leading-relaxed">{s}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
 // ─── Lead Details View ───────────────────────────────────────────────────────
 
 const LeadDetailsView = ({
   lead, onAudit, onVerify, isAuditing, isVerifying,
-  verificationResult, isVerifyingAll, onStatusUpdate,
+  verificationResult, isVerifyingAll, onStatusUpdate, auditResult,
 }: {
-  lead: Lead;
-  onAudit: (l: Lead) => void;
-  onVerify: (l: Lead) => void;
-  isAuditing: boolean;
-  isVerifying: boolean;
+  lead:               Lead;
+  onAudit:            (l: Lead) => void;
+  onVerify:           (l: Lead) => void;
+  isAuditing:         boolean;
+  isVerifying:        boolean;
   verificationResult?: VerificationResult;
-  isVerifyingAll?: boolean;
-  onStatusUpdate?: (leadId: string, status: string) => void;
+  isVerifyingAll?:    boolean;
+  onStatusUpdate?:    (leadId: string, status: string) => void;
+  auditResult?:       any;
 }) => {
   const [showRejection, setShowRejection] = useState(false);
-  const [localStatus, setLocalStatus] = useState(lead.status || 'new');
+  const [localStatus, setLocalStatus]     = useState(lead.status || 'new');
   useEffect(() => { setLocalStatus(lead.status || 'new'); }, [lead.id, lead.status]);
 
-  const emailVerif = (verificationResult as any)?.email;
+  const emailVerif   = (verificationResult as any)?.email;
   const websiteVerif = (verificationResult as any)?.website;
 
   const scoreColor =
     lead.score >= 80 ? '#10b981' :
-      lead.score >= 60 ? '#6366f1' :
-        lead.score >= 40 ? '#f59e0b' : '#ef4444';
+    lead.score >= 60 ? '#6366f1' :
+    lead.score >= 40 ? '#f59e0b' : '#ef4444';
+
+  // Determine audit button label based on lead state
+  const auditLabel =
+    !lead.email && !(lead as any).phone_number ? '🔍 Find Contact' :
+    (verificationResult as any)?.overall === 'failed'     ? '🔍 Verify & Enrich' :
+    '🔍 Deep Audit';
 
   return (
     <>
@@ -354,11 +483,10 @@ const LeadDetailsView = ({
         transition={{ duration: 0.25 }}
         className="bg-white/[0.02] border border-white/5 rounded-3xl md:rounded-[40px] overflow-hidden"
       >
-        {/* ── Header ─────────────────────────────────────────────────────── */}
+        {/* Header */}
         <div className="p-6 md:p-10 border-b border-white/5 bg-black/20">
           <div className="flex flex-col sm:flex-row items-start gap-6">
 
-            {/* Score ring */}
             <div className="shrink-0">
               {isVerifyingAll ? (
                 <CircularProgress value={0} size={80} strokeWidth={5} color="#6366f1" isSpinning
@@ -369,13 +497,11 @@ const LeadDetailsView = ({
               )}
             </div>
 
-            {/* Name / tags */}
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-3 mb-2">
                 <h2 className="text-2xl md:text-4xl font-black text-white tracking-tighter leading-none truncate max-w-full">
                   {lead.name}
                 </h2>
-
                 {localStatus === 'verified' && (
                   <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 rounded-full text-[9px] font-black text-emerald-400 uppercase tracking-widest">
                     <CheckBadgeIcon className="w-3.5 h-3.5" /> Verified
@@ -405,7 +531,6 @@ const LeadDetailsView = ({
               </div>
             </div>
 
-            {/* Action buttons */}
             <div className="flex sm:flex-col gap-2 shrink-0">
               <button onClick={() => onVerify(lead)} disabled={isVerifying || localStatus === 'verified'}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-30">
@@ -415,7 +540,7 @@ const LeadDetailsView = ({
               <button onClick={() => onAudit(lead)} disabled={isAuditing}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all disabled:opacity-30">
                 {isAuditing ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <FingerPrintIcon className="w-4 h-4" />}
-                Audit
+                {isAuditing ? 'Auditing…' : auditLabel}
               </button>
               <button onClick={() => setShowRejection(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
@@ -426,32 +551,32 @@ const LeadDetailsView = ({
           </div>
         </div>
 
-        {/* ── Contact + Email Deep Check ──────────────────────────────────── */}
+        {/* Contact + Email Deep Check */}
         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/5 border-b border-white/5">
 
-          {/* Left: contact */}
           <div className="p-6 md:p-10 space-y-5">
             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Contact Info</h4>
 
-            {lead.deepAudit?.decisionMaker ? (
+            {/* Decision maker from audit */}
+            {auditResult?.decision_maker?.name ? (
               <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
                 className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
                 <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-xl font-black shrink-0">
-                  {lead.deepAudit.decisionMaker.name.charAt(0)}
+                  {auditResult.decision_maker.name.charAt(0)}
                 </div>
                 <div>
-                  <p className="text-white font-bold leading-none mb-1">{lead.deepAudit.decisionMaker.name}</p>
-                  <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest">{lead.deepAudit.decisionMaker.role}</p>
+                  <p className="text-white font-bold leading-none mb-1">{auditResult.decision_maker.name}</p>
+                  <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest">{auditResult.decision_maker.title}</p>
                 </div>
               </motion.div>
             ) : (
               <div className="p-4 bg-white/5 rounded-2xl flex items-center gap-3 text-slate-500 text-[11px] italic">
-                <BriefcaseIcon className="w-4 h-4 shrink-0" /> Run Audit to identify decision maker
+                <BriefcaseIcon className="w-4 h-4 shrink-0" />
+                {isAuditing ? 'Searching for decision maker…' : 'Run Deep Audit to identify decision maker'}
               </div>
             )}
 
             <div className="space-y-3 pt-4 border-t border-white/5">
-              {/* Email */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <EnvelopeIcon className="w-4 h-4 text-slate-600 shrink-0" />
@@ -469,7 +594,6 @@ const LeadDetailsView = ({
                 </div>
               </div>
 
-              {/* Website */}
               <div className="flex items-center justify-between gap-3">
                 <a href={lead.website} target="_blank" rel="noreferrer"
                   className="flex items-center gap-3 text-sm text-indigo-400 hover:text-indigo-300 transition-all min-w-0">
@@ -486,7 +610,6 @@ const LeadDetailsView = ({
                 </div>
               </div>
 
-              {/* Phone */}
               {(lead.phone || (lead as any).phone_number) && (
                 <div className="flex items-center gap-3 text-sm text-slate-400">
                   <GlobeAltIcon className="w-4 h-4 text-slate-600 shrink-0" />
@@ -494,29 +617,18 @@ const LeadDetailsView = ({
                 </div>
               )}
 
-              {/* LinkedIn */}
-              {lead.deepAudit?.decisionMaker?.linkedinUrl && (
-                <a href={lead.deepAudit.decisionMaker.linkedinUrl} target="_blank" rel="noreferrer"
+              {auditResult?.decision_maker?.linkedin_url && (
+                <a href={auditResult.decision_maker.linkedin_url} target="_blank" rel="noreferrer"
                   className="flex items-center gap-3 text-sm text-cyan-400 hover:text-cyan-300 transition-all font-bold">
                   <LinkIcon className="w-4 h-4 shrink-0" /> LinkedIn Profile
                 </a>
               )}
             </div>
-
-            {lead.manualNotes && (
-              <div className="p-4 bg-black/20 border border-white/5 rounded-2xl">
-                <h5 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <SparklesIcon className="w-3 h-3" /> Verification Report
-                </h5>
-                <p className="text-[11px] text-slate-400 leading-relaxed italic">{lead.manualNotes}</p>
-              </div>
-            )}
           </div>
 
-          {/* Right: email deep check */}
+          {/* Email deep check */}
           <div className="p-6 md:p-10">
             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-5">Email Deep Check</h4>
-
             {isVerifyingAll ? (
               <div className="flex flex-col items-center justify-center py-12 gap-4">
                 <CircularProgress value={66} size={64} strokeWidth={5} color="#6366f1" isSpinning />
@@ -525,12 +637,12 @@ const LeadDetailsView = ({
             ) : emailVerif?.checks ? (
               <div className="space-y-3">
                 {[
-                  { key: 'format', label: 'Format', val: emailVerif.checks.format },
-                  { key: 'disposable', label: 'Not Disposable', val: !emailVerif.checks.disposable },
-                  { key: 'mx', label: 'MX Record', val: emailVerif.checks.mx },
-                  { key: 'smtp_reachable', label: 'SMTP Reach', val: emailVerif.checks.smtp_reachable },
-                  { key: 'is_catchall', label: 'Not Catchall', val: !emailVerif.checks.is_catchall },
-                  { key: 'mailbox_exists', label: 'Mailbox', val: emailVerif.checks.mailbox_exists },
+                  { key: 'format',         label: 'Format',        val: emailVerif.checks.format },
+                  { key: 'disposable',     label: 'Not Disposable',val: !emailVerif.checks.disposable },
+                  { key: 'mx',             label: 'MX Record',     val: emailVerif.checks.mx },
+                  { key: 'smtp_reachable', label: 'SMTP Reach',    val: emailVerif.checks.smtp_reachable },
+                  { key: 'is_catchall',    label: 'Not Catchall',  val: !emailVerif.checks.is_catchall },
+                  { key: 'mailbox_exists', label: 'Mailbox',       val: emailVerif.checks.mailbox_exists },
                 ].map(({ key, label, val }) => (
                   <div key={key} className="flex items-center justify-between">
                     <span className="text-[11px] text-slate-500">{label}</span>
@@ -542,19 +654,17 @@ const LeadDetailsView = ({
                     }
                   </div>
                 ))}
-
-                {/* Deliverability arc */}
                 <div className="pt-4 border-t border-white/5 flex items-center gap-4">
                   <CircularProgress
                     value={
                       emailVerif.deliverability === 'deliverable' ? 100 :
-                        emailVerif.deliverability === 'probable' ? 65 :
-                          emailVerif.deliverability === 'unknown' ? 40 : 10
+                      emailVerif.deliverability === 'probable'    ? 65  :
+                      emailVerif.deliverability === 'unknown'     ? 40  : 10
                     }
                     size={52} strokeWidth={4}
                     color={
                       emailVerif.deliverability === 'deliverable' ? '#10b981' :
-                        emailVerif.deliverability === 'probable' ? '#f59e0b' : '#ef4444'
+                      emailVerif.deliverability === 'probable'    ? '#f59e0b' : '#ef4444'
                     }
                   />
                   <div>
@@ -574,23 +684,25 @@ const LeadDetailsView = ({
           </div>
         </div>
 
-        {/* ── Strategic Analysis ──────────────────────────────────────────── */}
+        {/* Strategic Analysis */}
         <div className="p-6 md:p-10 bg-black/20">
           <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-5">Strategic Analysis</h4>
           <ReasoningDisplay
-            reasoning={lead.reasoning || 'No reasoning provided.'}
+            reasoning={(lead as any).reasoning || 'No reasoning provided.'}
             className="mb-6"
           />
-          {lead.deepAudit?.painPoints && lead.deepAudit.painPoints.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-3">Identified Pain Points</p>
-              {lead.deepAudit.painPoints.map((pt, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 bg-white/[0.02] rounded-xl border border-white/5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{pt}</p>
-                </div>
-              ))}
+
+          {/* Deep audit results rendered inline */}
+          {isAuditing && (
+            <div className="flex items-center gap-3 py-8 justify-center">
+              <ArrowPathIcon className="w-5 h-5 text-indigo-400 animate-spin" />
+              <p className="text-[11px] text-indigo-400 font-black uppercase tracking-widest animate-pulse">
+                Running deep audit…
+              </p>
             </div>
+          )}
+          {!isAuditing && auditResult && (
+            <DeepAuditPanel audit={auditResult} />
           )}
         </div>
       </motion.div>
@@ -603,50 +715,52 @@ const LeadDetailsView = ({
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const App: React.FC = () => {
-  const { user: currentUser, login, register, logout, updateUser, isLoading } = useAuth();
+  const { user: currentUser, login, logout, updateUser, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ── App state ──────────────────────────────────────────────────────────────
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  // App state
+  const [campaigns, setCampaigns]     = useState<Campaign[]>([]);
+  const [users, setUsers]             = useState<User[]>([]);
   const [globalLeads, setGlobalLeads] = useState<Lead[]>([]);
 
   // Search state
-  const [niche, setNiche] = useState('');
-  const [city, setCity] = useState('');
-  const [serviceOffered, setServiceOffered] = useState('');
+  const [niche, setNiche]                       = useState('');
+  const [city, setCity]                         = useState('');
+  const [serviceOffered, setServiceOffered]     = useState('');
   const [idealCompanyType, setIdealCompanyType] = useState('');
-  const [targetGoal, setTargetGoal] = useState(10);
-  const [nicheIntel, setNicheIntel] = useState<NicheIntel | null>(null);
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [foundInDb, setFoundInDb] = useState<Lead[]>([]);
+  const [targetGoal, setTargetGoal]             = useState(10);
+  const [nicheIntel, setNicheIntel]             = useState<NicheIntel | null>(null);
+  const [leads, setLeads]                       = useState<Lead[]>([]);
+  const [selectedLead, setSelectedLead]         = useState<Lead | null>(null);
 
   // Admin state
-  const [adminNiche, setAdminNiche] = useState('');
-  const [adminCity, setAdminCity] = useState('');
-  const [view, setView] = useState('');
+  const [adminNiche, setAdminNiche]                 = useState('');
+  const [adminCity, setAdminCity]                   = useState('');
+  const [view, setView]                             = useState('');
   const [isAdminCrawlLoading, setIsAdminCrawlLoading] = useState(false);
 
   // UI state
-  const [toasts, setToasts] = useState<{ id: string; message: string }[]>([]);
-  const [limitInfo, setLimitInfo] = useState<LimitInfo | null>(null);
+  const [toasts, setToasts]               = useState<{ id: string; message: string }[]>([]);
+  const [limitInfo, setLimitInfo]         = useState<LimitInfo | null>(null);
   const [showUpgradeWall, setShowUpgradeWall] = useState(false);
-  const [isVerifyingAll, setIsVerifyingAll] = useState(false);
+  const [isVerifyingAll, setIsVerifyingAll]   = useState(false);
   const [verificationResults, setVerificationResults] = useState<Record<string, VerificationResult>>({});
 
-  // ── Market exhaustion state ────────────────────────────────────────────────
+  // Market exhaustion
   const [marketExhausted, setMarketExhausted] = useState(false);
   const [suggestedCities, setSuggestedCities] = useState<string[]>([]);
 
   // Loading / error
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isAuditing, setIsAuditing] = useState(false);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState<string | null>(null);
+  const [isAuditing, setIsAuditing]   = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // ── Toasts ─────────────────────────────────────────────────────────────────
+  // Per-lead deep audit results (keyed by lead id)
+  const [auditResults, setAuditResults] = useState<Record<string, any>>({});
+
+  // Toasts
   const addToast = (message: string) => {
     const id = Math.random().toString(36).substr(2, 9);
     setToasts(prev => [...prev, { id, message }]);
@@ -656,12 +770,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const insights = [
       "Tip: Use specific niches like 'Boutique Solar' instead of just 'Solar' for higher quality leads.",
-      "Tip: The 'Deep Audit' feature uses AI to find decision-maker pain points before you reach out.",
+      "Tip: The 'Deep Audit' feature searches exhaustively for decision makers and contact routes.",
       "Tip: Grounded leads have been verified against live web signals in the last 24 hours.",
-      "Tip: Check the 'Success Rate' in your dashboard to see how your campaigns are performing.",
       "Tip: Use the 'City' field to narrow down your search to specific high-growth regions.",
-      "Tip: Our AI bypasses generic scrapers by indexing boutique leads directly from the live web.",
-      "Tip: Launch a new hunt from the dashboard to start discovering fresh market gems.",
       "Tip: If a market is exhausted, try a nearby city — the AI will find new leads there.",
       "Tip: Use the Feedback button on any lead to train the AI to find better matches.",
     ];
@@ -672,25 +783,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (view === 'setup') addToast("Tip: Be as specific as possible with your 'Ideal Company Type'.");
-    if (view === 'results') addToast("Tip: Click a lead to run a 'Deep Audit' and uncover outreach angles.");
+    if (view === 'setup')   addToast("Tip: Be as specific as possible with your 'Ideal Company Type'.");
+    if (view === 'results') addToast("Tip: Click a lead then run 'Deep Audit' to uncover outreach angles.");
   }, [view]);
 
-  // ── Initialisation ─────────────────────────────────────────────────────────
+  // Initialisation — load from localStorage
   useEffect(() => {
-    const storedCampaigns = localStorage.getItem('lg_campaigns');
-    const storedUsers = localStorage.getItem('lg_all_users');
+    const storedCampaigns   = localStorage.getItem('lg_campaigns');
+    const storedUsers       = localStorage.getItem('lg_all_users');
     const storedGlobalLeads = localStorage.getItem('lg_global_leads');
-
-    if (storedCampaigns) setCampaigns(JSON.parse(storedCampaigns));
+    if (storedCampaigns)   setCampaigns(JSON.parse(storedCampaigns));
     if (storedGlobalLeads) setGlobalLeads(JSON.parse(storedGlobalLeads));
-
     if (storedUsers) {
       setUsers(JSON.parse(storedUsers));
     } else {
       const initialUsers: User[] = [
-        { id: 'u1', email: 'admin@leadgen.ai', role: 'admin', plan: 'enterprise', credits: 9999, joinedAt: new Date().toISOString() },
-        { id: 'u2', email: 'demo@user.com', role: 'user', plan: 'pro', credits: 250, joinedAt: new Date().toISOString() },
+        { id: 'u1', email: 'admin@intentiq.io', role: 'admin', plan: 'enterprise', credits: 9999, joinedAt: new Date().toISOString() },
+        { id: 'u2', email: 'demo@user.com',     role: 'user',  plan: 'pro',        credits: 250,  joinedAt: new Date().toISOString() },
       ];
       setUsers(initialUsers);
       localStorage.setItem('lg_all_users', JSON.stringify(initialUsers));
@@ -708,7 +817,7 @@ const App: React.FC = () => {
     setGlobalLeads(gLeads);
   };
 
-  // ── Auth handlers ──────────────────────────────────────────────────────────
+  // Auth
   const handleLogin = async (email: string) => {
     try {
       setLoading(true);
@@ -723,21 +832,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => { logout(); setView('landing'); };
 
-  const deductCredits = (amount: number) => {
-    if (!currentUser) return false;
-    if (currentUser.role === 'admin') return true;
-    if (currentUser.credits < amount) {
-      setError('Insufficient credits. Please upgrade your plan.');
-      setView('billing');
-      return false;
-    }
-    const updated = { ...currentUser, credits: currentUser.credits - amount };
-    updateUser(updated);
-    saveAppState(updated, campaigns, users, globalLeads);
-    return true;
-  };
-
-  // ── startAnalysis ──────────────────────────────────────────────────────────
+  // startAnalysis — clears all state and navigates to search
   const startAnalysis = async () => {
     if (!niche || !city || !serviceOffered || !idealCompanyType) {
       setError('Niche, City, Service, and Ideal Profile are mandatory.');
@@ -746,15 +841,11 @@ const App: React.FC = () => {
     setLeads([]);
     setSelectedLead(null);
     setVerificationResults({});
+    setAuditResults({});
     setMarketExhausted(false);
     setSuggestedCities([]);
     setLoading(true);
     setError(null);
-    setFoundInDb([]);
-    const dbMatches = globalLeads.filter(l =>
-      l.niche.toLowerCase().includes(niche.toLowerCase()) &&
-      l.city.toLowerCase().includes(city.toLowerCase())
-    );
     try {
       setView('search');
     } catch {
@@ -764,30 +855,13 @@ const App: React.FC = () => {
     }
   };
 
-  const useDbLeads = () => {
-    setLeads(foundInDb);
-    const newCampaign: Campaign = {
-      id: 'db-' + Date.now(),
-      userId: currentUser?.id || 'anon',
-      city, niche, serviceOffered, idealCompanyType,
-      leads: foundInDb,
-      timestamp: new Date().toISOString(),
-      nicheIntel: nicheIntel || undefined,
-    };
-    const updated = [newCampaign, ...campaigns];
-    setCampaigns(updated);
-    saveAppState(currentUser, updated, users, globalLeads);
-    setView('results');
-    if (foundInDb.length > 0) setSelectedLead(foundInDb[0]);
-  };
-
-  // ── handleStatusUpdate — feedback loop ─────────────────────────────────────
+  // handleStatusUpdate
   const handleStatusUpdate = (leadId: string, status: string) => {
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l));
     setSelectedLead(prev => (prev && prev.id === leadId) ? { ...prev, status } : prev);
   };
 
-  // ── runDiscovery ───────────────────────────────────────────────────────────
+  // runDiscovery — calls real backend
   const runDiscovery = async (count: number) => {
     setLoading(true);
     setError(null);
@@ -796,49 +870,44 @@ const App: React.FC = () => {
     setMarketExhausted(false);
     setSuggestedCities([]);
     setVerificationResults({});
+    setAuditResults({});
 
     try {
       const response = await api.post('/search-leads', {
         niche, city, count, idealCompanyType,
       });
 
-      const {
-        data: foundLeads,
-        limit_info,
-        market_exhausted,
-      } = response.data;
+      const { data: foundLeads, limit_info, market_exhausted } = response.data;
 
       if (limit_info) setLimitInfo(limit_info);
 
       const normalized = (foundLeads || []).map((l: any) => ({
         ...l,
-        phone: l.phone_number || l.phone,
-        city: l.city || city,
-        niche: l.niche || niche,
+        phone:          l.phone_number || l.phone,
+        city:           l.city  || city,
+        niche:          l.niche || niche,
         scoreBreakdown: l.scoreBreakdown ?? {},
-        socials: {},
-        source: l.source || 'ai_search',
-        confidence: l.score,
+        socials:        {},
+        source:         l.source || 'ai_search',
+        confidence:     l.score,
       }));
 
-      // ── FIXED: only proceed if we actually got leads ──────────────────────
       if (!normalized.length) {
         setError(
           market_exhausted
             ? `Market exhausted — no more ${niche} leads found in ${city}. Try a nearby city.`
-            : 'No leads found for this search. Try a broader niche or different city.'
+            : 'No leads found. Try a broader niche or different city.'
         );
         setLoading(false);
-        return; // stay on /search, don't navigate
+        return;
       }
 
       if (market_exhausted) setMarketExhausted(true);
-
       setLeads(normalized);
       setSelectedLead(normalized[0]);
       navigate('/results');
 
-      // ── Background verification ───────────────────────────────────────────
+      // Background verification
       setIsVerifyingAll(true);
       const leadIds = normalized.map((l: any) => l.id);
       verifyLeads(leadIds)
@@ -850,91 +919,116 @@ const App: React.FC = () => {
         .catch((e: any) => console.error('Verification error:', e))
         .finally(() => setIsVerifyingAll(false));
 
-      // ── Suggested cities when exhausted ──────────────────────────────────
       if (market_exhausted) {
         try {
           const exRes = await api.post('/market-exhaustion', { niche, city });
-          if (exRes.data?.suggested_cities?.length) {
-            setSuggestedCities(exRes.data.suggested_cities);
-          }
-        } catch (_) { /* non-critical */ }
+          if (exRes.data?.suggested_cities?.length) setSuggestedCities(exRes.data.suggested_cities);
+        } catch (_) {}
       }
 
     } catch (e: any) {
       const errData = e.response?.data;
       if (errData?.error === 'trial_expired') { setShowUpgradeWall(true); return; }
       setError(errData?.message || errData?.error || 'Search failed. Please try again.');
-      // stay on current page — do NOT navigate
     } finally {
       setLoading(false);
     }
   };
 
-  // ── handleVerifyLead ───────────────────────────────────────────────────────
+  // handleVerifyLead — calls real backend single verify
   const handleVerifyLead = async (lead: Lead) => {
     if (isVerifying) return;
     setIsVerifying(true);
     try {
-      const result = await verifyLeadContact(lead);
+      const res = await api.post(`/verify-lead/${lead.id}`);
+      const result = res.data;
+      const overall = result.overall;
       const updatedLeads = leads.map(l => l.id === lead.id
-        ? { ...l, status: result.verified ? 'verified' : 'failed', manualNotes: result.message, confidence: result.confidence }
+        ? { ...l, status: overall === 'verified' ? 'verified' : l.status }
         : l
       );
       setLeads(updatedLeads);
       const current = updatedLeads.find(l => l.id === lead.id);
       if (current) setSelectedLead(current);
-      const updatedGlobal = globalLeads.map(l => l.id === lead.id ? current! : l);
-      const updatedCampaigns = campaigns.map(c => ({ ...c, leads: c.leads.map(l => l.id === lead.id ? current! : l) }));
-      setCampaigns(updatedCampaigns);
-      saveAppState(currentUser, updatedCampaigns, users, updatedGlobal);
-    } catch { setError('Contact verification failed.'); }
-    finally { setIsVerifying(false); }
+      // Store verification result so the badge shows immediately
+      setVerificationResults(prev => ({ ...prev, [lead.id]: result }));
+    } catch (e: any) {
+      const errData = e.response?.data;
+      if (errData?.error === 'pro_required') {
+        setError('Lead verification is available on the Pro plan.');
+      } else {
+        setError('Contact verification failed.');
+      }
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
-  // ── performAudit ───────────────────────────────────────────────────────────
+  // performAudit — calls real /deep-audit/<lead_id> backend endpoint
   const performAudit = async (lead: Lead) => {
     if (isAuditing) return;
     setIsAuditing(true);
     try {
-      const result = await performDeepAudit(lead, serviceOffered, 'intelligence');
-      const updatedLeads = leads.map(l => l.id === lead.id ? { ...l, deepAudit: result, score: result.realnessScore } : l);
-      setLeads(updatedLeads);
-      setSelectedLead({ ...lead, deepAudit: result, score: result.realnessScore });
-      const updatedGlobal = globalLeads.map(l => l.id === lead.id ? { ...l, deepAudit: result, score: result.realnessScore } : l);
-      const updatedCampaigns = campaigns.map(c => ({ ...c, leads: c.leads.map(l => l.id === lead.id ? { ...l, deepAudit: result, score: result.realnessScore } : l) }));
-      setCampaigns(updatedCampaigns);
-      saveAppState(currentUser, updatedCampaigns, users, updatedGlobal);
-    } catch { setError('Deep audit failed.'); }
-    finally { setIsAuditing(false); }
+      const res    = await api.post(`/deep-audit/${lead.id}`);
+      const result = res.data;
+
+      // Update the lead in state if backend found better data
+      if (result.updated) {
+        const updatedLeads = leads.map(l => l.id === lead.id
+          ? {
+              ...l,
+              email:        result.email        ?? l.email,
+              website:      result.website      ?? l.website,
+              phone_number: result.phone_number ?? (l as any).phone_number,
+            }
+          : l
+        );
+        setLeads(updatedLeads);
+        const current = updatedLeads.find(l => l.id === lead.id);
+        if (current) setSelectedLead(current);
+      }
+
+      // Store audit result for this lead
+      setAuditResults(prev => ({ ...prev, [lead.id]: result }));
+
+    } catch (e: any) {
+      const errData = e.response?.data;
+      if (errData?.error === 'pro_required') {
+        setError('Deep Audit is available on the Pro plan.');
+      } else {
+        setError('Deep audit failed. Please try again.');
+      }
+    } finally {
+      setIsAuditing(false);
+    }
   };
 
-  // ── Admin crawl ────────────────────────────────────────────────────────────
+  // Admin crawl — kept but no longer uses geminiService
   const runAdminGlobalCrawl = async () => {
     if (!adminNiche || !adminCity) return;
     setIsAdminCrawlLoading(true);
     try {
-      const criteria: QualificationCriteria = {
-        niche: adminNiche, city: adminCity, mustHaveAds: true,
-        industryKeywords: adminNiche.split(' '),
-        additionalNotes: 'Admin Global Repository Ingestion',
+      // Seed vault via backend search with admin account
+      const res = await api.post('/search-leads', {
+        niche: adminNiche,
+        city:  adminCity,
+        count: 20,
         idealCompanyType: 'Any',
-        excludedWebsites: globalLeads.map(l => l.website),
-      };
-      const found = await discoverLeads(criteria, 20, 'performance');
-      const existingUrls = new Set(globalLeads.map(l => l.website.toLowerCase()));
-      const uniqueNew = found.filter(l => !existingUrls.has(l.website.toLowerCase()));
-      const updatedGlobal = [...globalLeads, ...uniqueNew];
-      saveAppState(currentUser, campaigns, users, updatedGlobal);
-      alert(`Ingestion Complete! Found ${found.length} leads. ${uniqueNew.length} were new.`);
+      });
+      const found = res.data?.data || [];
+      alert(`Ingestion Complete! Found ${found.length} leads.`);
       setAdminNiche('');
       setAdminCity('');
-    } catch { setError('Admin ingestion crawl failed.'); }
-    finally { setIsAdminCrawlLoading(false); }
+    } catch {
+      setError('Admin ingestion crawl failed.');
+    } finally {
+      setIsAdminCrawlLoading(false);
+    }
   };
 
   const handlePlanUpgrade = (planId: PlanType) => {
     if (!currentUser) return;
-    const plan = PLANS.find(p => p.id === planId)!;
+    const plan        = PLANS.find(p => p.id === planId)!;
     const updatedUser = { ...currentUser, plan: planId, credits: currentUser.credits + plan.credits };
     updateUser(updatedUser);
     saveAppState(updatedUser, campaigns, users, globalLeads);
@@ -942,17 +1036,17 @@ const App: React.FC = () => {
   };
 
   const clearDatabase = () => {
-    if (window.confirm('Are you sure you want to clear the entire global lead repository?')) {
+    if (window.confirm('Clear the entire global lead repository?')) {
       saveAppState(currentUser, campaigns, users, []);
     }
   };
 
-  // ── Expand city helper ─────────────────────────────────────────────────────
   const handleExpandCity = (newCity: string) => {
     setCity(newCity);
     setLeads([]);
     setSelectedLead(null);
     setVerificationResults({});
+    setAuditResults({});
     navigate('/setup');
   };
 
@@ -1021,7 +1115,8 @@ const App: React.FC = () => {
                         <p className="text-[8px] md:text-[9px] font-bold text-indigo-500 uppercase">
                           {currentUser.credits} CR
                         </p>
-                      )}                    </div>
+                      )}
+                    </div>
                     <button onClick={handleLogout}
                       className="p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-400 transition-all">
                       <ArrowLeftOnRectangleIcon className="w-4 h-4" />
@@ -1055,7 +1150,7 @@ const App: React.FC = () => {
 
             <Routes>
               <Route path="/" element={<LandingView setView={setView} onNavigate={navigate} />} />
-              <Route path="/login" element={<LoginInput onLogin={handleLogin} initialMode="login" />} />
+              <Route path="/login"    element={<LoginInput onLogin={handleLogin} initialMode="login"    />} />
               <Route path="/register" element={<LoginInput onLogin={handleLogin} initialMode="register" />} />
 
               <Route path="/dashboard" element={
@@ -1094,12 +1189,11 @@ const App: React.FC = () => {
                 </AdminRoute>
               } />
 
-              {/* ── Results ──────────────────────────────────────────────── */}
+              {/* Results */}
               <Route path="/results" element={
                 <ProtectedRoute currentUser={currentUser} isLoading={isLoading}>
                   <div className="w-full flex flex-col gap-4 py-6 md:py-10 max-w-[1600px] animate-in fade-in duration-500">
 
-                    {/* Exhausted market banner */}
                     {marketExhausted && (
                       <ExhaustedMarketBanner
                         niche={niche} city={city}
@@ -1125,6 +1219,7 @@ const App: React.FC = () => {
                             setLeads([]);
                             setSelectedLead(null);
                             setVerificationResults({});
+                            setAuditResults({});
                             setMarketExhausted(false);
                             setSuggestedCities([]);
                             navigate('/dashboard');
@@ -1136,22 +1231,24 @@ const App: React.FC = () => {
 
                         <div className="space-y-3 overflow-y-auto max-h-[40vh] lg:max-h-[70vh] pr-2 custom-scrollbar">
                           {leads.map(l => {
-                            const vr = verificationResults[l.id] as any;
+                            const vr      = verificationResults[l.id] as any;
                             const emailOk = vr?.email?.is_valid;
+                            const hasAudit = !!auditResults[l.id];
                             return (
                               <div
                                 key={l.id}
                                 onClick={() => { setSelectedLead(l); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                                className={`p-4 md:p-5 rounded-2xl border cursor-pointer transition-all ${selectedLead?.id === l.id
-                                  ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/5'
-                                  : 'bg-white/[0.02] border-white/5 hover:border-white/20'
-                                  }`}
+                                className={`p-4 md:p-5 rounded-2xl border cursor-pointer transition-all ${
+                                  selectedLead?.id === l.id
+                                    ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/5'
+                                    : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                                }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 truncate">
-                                    {l.status === 'verified' && <CheckBadgeIcon className="w-4 h-4 text-emerald-400 shrink-0" />}
-                                    {l.status === 'qualified' && <CheckCircleIcon className="w-4 h-4 text-blue-400 shrink-0" />}
-                                    {l.status === 'rejected' && <XCircleIcon className="w-4 h-4 text-red-400 shrink-0" />}
+                                    {l.status === 'verified'  && <CheckBadgeIcon className="w-4 h-4 text-emerald-400 shrink-0" />}
+                                    {l.status === 'qualified' && <CheckCircleIcon  className="w-4 h-4 text-blue-400 shrink-0"   />}
+                                    {l.status === 'rejected'  && <XCircleIcon      className="w-4 h-4 text-red-400 shrink-0"    />}
                                     <h4 className="text-white font-bold text-sm truncate">{l.name}</h4>
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
@@ -1171,9 +1268,9 @@ const App: React.FC = () => {
                                     <SourceBadge source={(l as any).source} />
                                   </div>
                                 )}
-                                {/* Buying signal preview in list */}
+                                {/* Buying signal preview */}
                                 {(() => {
-                                  const { intentKeywords, sourceConfig } = parseReasoning((l as any).reasoning || '');
+                                  const { intentKeywords } = parseReasoning((l as any).reasoning || '');
                                   return intentKeywords.length > 0 ? (
                                     <div className="mt-2 flex items-center gap-1.5 text-[9px] font-black text-amber-400 uppercase tracking-widest">
                                       <BoltIcon className="w-3 h-3" />
@@ -1182,9 +1279,9 @@ const App: React.FC = () => {
                                     </div>
                                   ) : null;
                                 })()}
-                                {l.deepAudit?.decisionMaker && (
-                                  <div className="mt-3 flex items-center gap-2 text-[9px] font-bold text-indigo-300 uppercase tracking-tighter">
-                                    <CheckBadgeIcon className="w-3 h-3" /> Decision Maker ID'd
+                                {hasAudit && (
+                                  <div className="mt-2 flex items-center gap-1.5 text-[9px] font-black text-indigo-300 uppercase tracking-widest">
+                                    <FingerPrintIcon className="w-3 h-3" /> Audited
                                   </div>
                                 )}
                               </div>
@@ -1205,6 +1302,7 @@ const App: React.FC = () => {
                             verificationResult={verificationResults[selectedLead.id]}
                             isVerifyingAll={isVerifyingAll}
                             onStatusUpdate={handleStatusUpdate}
+                            auditResult={auditResults[selectedLead.id] ?? null}
                           />
                         ) : (
                           <div className="h-full border border-dashed border-white/10 rounded-3xl md:rounded-[40px] flex flex-col items-center justify-center py-20 md:py-40">
@@ -1220,7 +1318,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } />
 
-              {/* ── Search / Strategy ────────────────────────────────────── */}
+              {/* Search / Strategy */}
               <Route path="/search" element={
                 <ProtectedRoute currentUser={currentUser} isLoading={isLoading}>
                   <div className="max-w-xl w-full py-20 animate-in fade-in duration-700">
@@ -1234,36 +1332,14 @@ const App: React.FC = () => {
                       <>
                         <div className="text-center mb-12">
                           <h2 className="text-4xl font-black text-white mb-4">Hunt Ready</h2>
-                          <p className="text-slate-500 text-sm">We've identified the best boutique strategy for {niche}.</p>
+                          <p className="text-slate-500 text-sm">Identified the best strategy for <span className="text-white font-bold">{niche}</span> in <span className="text-white font-bold">{city}</span>.</p>
                         </div>
-
-                        {foundInDb.length > 0 && (
-                          <div className="mb-8 p-8 bg-emerald-500/5 border border-emerald-500/20 rounded-3xl animate-in slide-in-from-top-4">
-                            <div className="flex items-center gap-4 mb-4">
-                              <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400">
-                                <CircleStackIcon className="w-6 h-6" />
-                              </div>
-                              <div>
-                                <h4 className="text-white font-bold tracking-tight">Existing Leads Found!</h4>
-                                <p className="text-[10px] text-slate-500 uppercase font-black">Database Match: {foundInDb.length} Gems</p>
-                              </div>
-                            </div>
-                            <p className="text-slate-400 text-xs mb-6 leading-relaxed">
-                              We already have {foundInDb.length} verified leads for this niche/city in our repository. Access them instantly for 0 credits.
-                            </p>
-                            <button onClick={useDbLeads}
-                              className="w-full bg-emerald-600 py-4 rounded-xl text-white font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-600/10 hover:bg-emerald-500 transition-all">
-                              Access Global Index (0 Credits)
-                            </button>
-                          </div>
-                        )}
 
                         <div className="space-y-6">
                           <div className="bg-indigo-500/5 border border-indigo-500/20 p-8 rounded-3xl">
                             <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-widest flex items-center gap-2">
-                              <SparklesIcon className="w-4 h-4" /> Target Intelligence
+                              <SparklesIcon className="w-4 h-4" /> Launch Parameters
                             </h4>
-                            <p className="text-slate-400 text-sm italic mb-6">"{nicheIntel?.idealLeadProfile}"</p>
                             <div className="flex items-center justify-between mb-6">
                               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Leads to Hunt</span>
                               <div className="flex items-center gap-4">
@@ -1299,7 +1375,7 @@ const App: React.FC = () => {
 
               <Route path="/pricing" element={<BillingView currentUser={currentUser} onUpgrade={handlePlanUpgrade} />} />
               <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate(-1)} />} />
-              <Route path="/terms" element={<TermsOfService onBack={() => navigate(-1)} />} />
+              <Route path="/terms"   element={<TermsOfService onBack={() => navigate(-1)} />} />
             </Routes>
           </main>
 
@@ -1307,14 +1383,14 @@ const App: React.FC = () => {
           {location.pathname !== '/login' && location.pathname !== '/register' && (
             <footer className="px-10 py-6 bg-black/40 border-t border-white/[0.02] flex items-center justify-between text-[9px] font-bold text-slate-700 uppercase tracking-widest">
               <div className="flex items-center gap-8">
-                <span>&copy; 2025 LEADGEN AI PRO</span>
+                <span>&copy; 2025 INTENTIQ</span>
                 <span className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> All Systems Operational
                 </span>
               </div>
               <div className="flex gap-6">
                 <button onClick={() => navigate('/privacy')} className="hover:text-white transition-colors">Privacy</button>
-                <button onClick={() => navigate('/terms')} className="hover:text-white transition-colors">Terms</button>
+                <button onClick={() => navigate('/terms')}   className="hover:text-white transition-colors">Terms</button>
                 <a href="#" className="hover:text-white transition-colors">Help</a>
               </div>
             </footer>
