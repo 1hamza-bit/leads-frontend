@@ -13,7 +13,8 @@ import {
   MagnifyingGlassIcon, ArrowPathIcon, ShieldCheckIcon, GlobeAltIcon, EnvelopeIcon,
   LinkIcon, QueueListIcon, PlusIcon, CheckBadgeIcon, FingerPrintIcon,
   BriefcaseIcon, CircleStackIcon, ArrowLeftOnRectangleIcon,
-  XCircleIcon, HandThumbDownIcon
+  XCircleIcon, HandThumbDownIcon,
+  CloudArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import LoginInput from './src/components/login';
@@ -428,6 +429,251 @@ const DeepAuditPanel = ({ audit }: { audit: any }) => {
   );
 };
 
+// ─── CRM Export Modal ─────────────────────────────────────────────────────────
+//
+// Calls GET /my-leads/export?format=xxx from the backend.
+// This exports ALL of the user's saved leads — not just the current search
+// session — and includes verification status, deep audit data, decision maker.
+//
+// Two modes:
+//   scope='all'     — export everything from the database (dashboard button)
+//   scope='session' — export current search results only (results page button)
+//
+// When scope='session' the backend is still called with the current lead IDs
+// as a filter so the export still includes full DB data (verification etc).
+ 
+const CRMExportModal = ({
+  leads,
+  scope = 'all',
+  filterNiche,
+  filterCity,
+  onClose,
+}: {
+  leads: Lead[];
+  scope?: 'all' | 'session';
+  filterNiche?: string;
+  filterCity?: string;
+  onClose: () => void;
+}) => {
+  const [format, setFormat]   = useState<'csv' | 'json' | 'hubspot' | 'salesforce'>('csv');
+  const [status, setStatus]   = useState<'all' | 'new' | 'contacted' | 'qualified' | 'verified'>('all');
+  const [exporting, setExporting] = useState(false);
+  const [done, setDone]       = useState(false);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [countLoading, setCountLoading] = useState(false);
+ 
+  const FORMATS = [
+    { id: 'csv',        label: 'CSV',           sub: 'Universal — opens in Excel/Sheets',   color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5'  },
+    { id: 'json',       label: 'JSON',           sub: 'All fields incl. deep audit data',    color: 'text-blue-400 border-blue-500/30 bg-blue-500/5'           },
+    { id: 'hubspot',    label: 'HubSpot CSV',    sub: 'Direct import — HubSpot contacts',    color: 'text-orange-400 border-orange-500/30 bg-orange-500/5'     },
+    { id: 'salesforce', label: 'Salesforce CSV', sub: 'Direct import — Salesforce leads',    color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5'           },
+  ] as const;
+ 
+  const STATUSES = [
+    { id: 'all',       label: 'All leads'      },
+    { id: 'new',       label: 'New only'       },
+    { id: 'contacted', label: 'Contacted'      },
+    { id: 'qualified', label: 'Qualified'      },
+    { id: 'verified',  label: 'Verified only'  },
+  ] as const;
+ 
+  // Preview count — how many leads will be exported
+  useEffect(() => {
+    setCountLoading(true);
+    const params = new URLSearchParams({ format: 'json' });
+    if (status !== 'all') params.set('status', status);
+    if (filterNiche) params.set('niche', filterNiche);
+    if (filterCity)  params.set('city',  filterCity);
+ 
+    api.get(`/my-leads?${params.toString()}&per_page=1`)
+      .then(res => setTotalCount(res.data.pagination?.total_count ?? null))
+      .catch(() => setTotalCount(scope === 'session' ? leads.length : null))
+      .finally(() => setCountLoading(false));
+  }, [status, filterNiche, filterCity]);
+ 
+  const FIELD_LABELS: Record<string, string> = {
+    csv:        'Name, Email, Phone, Website, City, Niche, Score, Status, Reasoning, Email Verified, Website Live, Decision Maker',
+    json:       'All fields including deep audit, decision maker, social profiles, activity signals',
+    hubspot:    'First Name, Last Name, Email, Phone, Website URL, City, Industry, Lead Status, Notes, Score, Email Verified',
+    salesforce: 'Last Name, First Name, Email, Phone, Website, City, Industry, Lead Status, Description, Rating (Hot/Warm/Cold)',
+  };
+ 
+  const doExport = async () => {
+    setExporting(true);
+    try {
+      // Build URL with filters
+      const params = new URLSearchParams({ format });
+      if (status !== 'all')  params.set('status', status);
+      if (filterNiche)       params.set('niche', filterNiche);
+      if (filterCity)        params.set('city',  filterCity);
+ 
+      // Call the backend — it returns a file directly
+      const token    = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || '';
+      const response = await fetch(`${api.defaults.baseURL || ''}/my-leads/export?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+ 
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `Export failed: ${response.status}`);
+      }
+ 
+      // Get filename from Content-Disposition header
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const filenameMatch = disposition.match(/filename=(.+)/);
+      const filename = filenameMatch ? filenameMatch[1] : `intentiq-export.${format === 'json' ? 'json' : 'csv'}`;
+ 
+      const blob = await response.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+ 
+      setDone(true);
+      setTimeout(() => setDone(false), 3000);
+    } catch (err: any) {
+      console.error('Export failed:', err);
+      alert(err.message || 'Export failed. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+ 
+  const exportCount = countLoading ? '…' : (totalCount ?? leads.length);
+ 
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}>
+      <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
+        className="w-full max-w-lg bg-[#0d0e14] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+        onClick={e => e.stopPropagation()}>
+ 
+        {/* Header */}
+        <div className="p-6 border-b border-white/5 flex items-center gap-4">
+          <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center">
+            <CloudArrowDownIcon className="w-5 h-5 text-indigo-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-bold text-base">Export to CRM</h3>
+            <p className="text-slate-500 text-[10px]">
+              {scope === 'all'
+                ? 'Export all your saved leads from the database'
+                : 'Export current search session results'}
+            </p>
+          </div>
+          <button onClick={onClose} className="ml-auto text-slate-600 hover:text-white transition-colors text-xl">×</button>
+        </div>
+ 
+        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+ 
+          {/* Status filter */}
+          <div>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Filter by Status</p>
+            <div className="flex flex-wrap gap-2">
+              {STATUSES.map(s => (
+                <button key={s.id} onClick={() => setStatus(s.id as any)}
+                  className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+                    status === s.id
+                      ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-400'
+                      : 'bg-white/[0.02] border-white/5 text-slate-500 hover:border-white/20'
+                  }`}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+ 
+          {/* Format picker */}
+          <div>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Export Format</p>
+            <div className="space-y-2">
+              {FORMATS.map(f => (
+                <button key={f.id} onClick={() => setFormat(f.id as any)}
+                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl border transition-all text-left ${
+                    format === f.id
+                      ? f.color + ' border-opacity-100'
+                      : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                  }`}>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${format === f.id ? 'border-current' : 'border-slate-600'}`}>
+                    {format === f.id && <div className="w-2 h-2 rounded-full bg-current" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-bold text-sm ${format === f.id ? 'text-white' : 'text-slate-400'}`}>{f.label}</p>
+                    <p className="text-[10px] text-slate-600 mt-0.5">{f.sub}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+ 
+          {/* Fields preview */}
+          <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl space-y-1.5">
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Fields in this export</p>
+            <p className="text-[10px] text-slate-400 leading-relaxed">{FIELD_LABELS[format]}</p>
+          </div>
+ 
+          {/* How to import guide */}
+          {(format === 'hubspot' || format === 'salesforce') && (
+            <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-xl">
+              <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1.5">
+                How to import into {format === 'hubspot' ? 'HubSpot' : 'Salesforce'}
+              </p>
+              {format === 'hubspot' ? (
+                <ol className="text-[10px] text-slate-500 space-y-1 list-decimal list-inside">
+                  <li>Go to Contacts → Import</li>
+                  <li>Choose "Import file from computer"</li>
+                  <li>Select "Contacts" as object type</li>
+                  <li>Upload this CSV — columns map automatically</li>
+                  <li>Review & confirm duplicate handling</li>
+                </ol>
+              ) : (
+                <ol className="text-[10px] text-slate-500 space-y-1 list-decimal list-inside">
+                  <li>Go to Leads → Import</li>
+                  <li>Select "Insert new records"</li>
+                  <li>Upload this CSV</li>
+                  <li>Map columns — Last Name is required</li>
+                  <li>Click Import Now</li>
+                </ol>
+              )}
+            </div>
+          )}
+        </div>
+ 
+        {/* Footer CTA */}
+        <div className="p-6 pt-0 border-t border-white/5">
+          {/* Lead count */}
+          <div className="flex items-center justify-between mb-4 px-1">
+            <span className="text-[10px] text-slate-500">Leads to export</span>
+            <span className="text-[10px] font-black text-white">
+              {countLoading
+                ? <ArrowPathIcon className="w-3.5 h-3.5 animate-spin inline text-slate-500" />
+                : <>{exportCount} lead{Number(exportCount) !== 1 ? 's' : ''}</>}
+            </span>
+          </div>
+ 
+          <button onClick={doExport} disabled={exporting || done}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shadow-lg shadow-indigo-600/20">
+            {exporting
+              ? <><ArrowPathIcon className="w-4 h-4 animate-spin" /> Preparing {format.toUpperCase()}…</>
+              : done
+              ? <><CheckCircleIcon className="w-4 h-4" /> Downloaded — check your downloads!</>
+              : <><CloudArrowDownIcon className="w-4 h-4" /> Download {format.toUpperCase()} ({exportCount} leads)</>}
+          </button>
+          <button onClick={onClose}
+            className="mt-3 w-full text-slate-600 text-[9px] font-bold uppercase tracking-widest hover:text-white transition-colors">
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 // ─── Lead Details View ───────────────────────────────────────────────────────
 
 const LeadDetailsView = ({
@@ -759,6 +1005,8 @@ const App: React.FC = () => {
 
   // Per-lead deep audit results (keyed by lead id)
   const [auditResults, setAuditResults] = useState<Record<string, any>>({});
+    const [showExport, setShowExport]       = useState(false);
+
 
   // Toasts
   const addToast = (message: string) => {
@@ -1077,6 +1325,11 @@ const App: React.FC = () => {
             </AnimatePresence>
           </div>
 
+           {/* CRM Export Modal */}
+          <AnimatePresence>
+            {showExport && <CRMExportModal leads={leads} onClose={() => setShowExport(false)} />}
+          </AnimatePresence>
+
           {/* Header */}
           <header className="px-4 md:px-10 py-4 md:py-5 flex items-center justify-between border-b border-white/[0.02] bg-black/50 backdrop-blur-2xl sticky top-0 z-50">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate(currentUser ? '/dashboard' : '/')}>
@@ -1215,6 +1468,13 @@ const App: React.FC = () => {
                               </span>
                             )}
                           </h3>
+                            {/* Export button */}
+                            {leads.length > 0 && (
+                              <button onClick={() => setShowExport(true)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all">
+                                <CloudArrowDownIcon className="w-3.5 h-3.5" /> Export
+                              </button>
+                            )}
                           <button onClick={() => {
                             setLeads([]);
                             setSelectedLead(null);
