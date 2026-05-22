@@ -7,7 +7,7 @@ import {
   ChevronLeftIcon, ChevronRightIcon, CheckBadgeIcon,
   XMarkIcon, ExclamationTriangleIcon, ClockIcon,
   ChevronDownIcon, ArrowsUpDownIcon, LinkIcon,
-  BuildingOfficeIcon, MapPinIcon,
+  BuildingOfficeIcon, MapPinIcon, CloudArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import {
@@ -15,6 +15,7 @@ import {
   MyLead, LeadFilters, LeadsPagination,
   DashboardStats, getDashboardStats
 } from '../services/authService';
+import api from './api';
 
 type DashTab = 'overview' | 'leads';
 
@@ -69,7 +70,7 @@ const TrialBanner = ({ planInfo, onUpgrade }: { planInfo: PlanInfo; onUpgrade: (
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FILTER SELECT  (custom dropdown replaces native <select>)
+// FILTER SELECT
 // ─────────────────────────────────────────────────────────────────────────────
 const FilterSelect = ({
   value, onChange, options, placeholder, icon, accentColor = 'indigo',
@@ -89,47 +90,28 @@ const FilterSelect = ({
     amber:  { ring: 'border-amber-500/60',  text: 'text-amber-400',  bg: 'bg-amber-500/10'  },
   };
   const a = accent[accentColor];
-
   return (
     <div className="relative">
-      {/* Trigger button */}
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
+      <button type="button" onClick={() => setOpen(o => !o)}
         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
-          ${value
-            ? `${a.bg} ${a.ring} ${a.text}`
-            : 'bg-white/[0.03] border-white/10 text-slate-500 hover:border-white/20 hover:text-slate-300'
-          }`}
-      >
+          ${value ? `${a.bg} ${a.ring} ${a.text}` : 'bg-white/[0.03] border-white/10 text-slate-500 hover:border-white/20 hover:text-slate-300'}`}>
         {icon && <span className="shrink-0 opacity-70">{icon}</span>}
         <span>{selected?.label ?? placeholder}</span>
         <ChevronDownIcon className={`w-3 h-3 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
-
       {open && (
         <>
-          {/* Click-outside backdrop */}
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          {/* Dropdown list */}
           <div className="absolute top-full left-0 mt-1.5 z-50 min-w-[180px] max-h-56 overflow-y-auto
             bg-[#0d0e14] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 py-1.5
             [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10">
             {options.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => { onChange(opt.value); setOpen(false); }}
+              <button key={opt.value} type="button" onClick={() => { onChange(opt.value); setOpen(false); }}
                 className={`w-full text-left px-4 py-2.5 text-[11px] font-bold flex items-center gap-2.5 transition-colors
-                  ${opt.value === value
-                    ? `${a.text} ${a.bg}`
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
-              >
+                  ${opt.value === value ? `${a.text} ${a.bg}` : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
                 {opt.value === value
                   ? <CheckCircleIcon className={`w-3.5 h-3.5 shrink-0 ${a.text}`} />
-                  : <span className="w-3.5" />
-                }
+                  : <span className="w-3.5" />}
                 {opt.label}
               </button>
             ))}
@@ -143,9 +125,7 @@ const FilterSelect = ({
 // ─────────────────────────────────────────────────────────────────────────────
 // SORT TOGGLE
 // ─────────────────────────────────────────────────────────────────────────────
-const SortToggle = ({
-  sortBy, order, onChange,
-}: {
+const SortToggle = ({ sortBy, order, onChange }: {
   sortBy: string; order: string; onChange: (s: string, o: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
@@ -160,11 +140,8 @@ const SortToggle = ({
   const current = opts.find(o => o.sort === sortBy && o.ord === order) ?? opts[0];
   return (
     <div className="relative ml-auto">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-slate-500 hover:border-white/20 hover:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-all"
-      >
+      <button type="button" onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-slate-500 hover:border-white/20 hover:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-all">
         <ArrowsUpDownIcon className="w-3.5 h-3.5" />
         <span className="hidden sm:inline">{current.label}</span>
         <ChevronDownIcon className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -176,13 +153,10 @@ const SortToggle = ({
             {opts.map(opt => {
               const active = opt.sort === sortBy && opt.ord === order;
               return (
-                <button
-                  key={`${opt.sort}-${opt.ord}`}
-                  type="button"
+                <button key={`${opt.sort}-${opt.ord}`} type="button"
                   onClick={() => { onChange(opt.sort, opt.ord); setOpen(false); }}
                   className={`w-full text-left px-4 py-2.5 text-[11px] font-bold flex items-center gap-2.5 transition-colors
-                    ${active ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
-                >
+                    ${active ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
                   {active ? <CheckCircleIcon className="w-3.5 h-3.5 shrink-0 text-indigo-400" /> : <span className="w-3.5" />}
                   {opt.label}
                 </button>
@@ -201,13 +175,9 @@ const SortToggle = ({
 const PerPageToggle = ({ value, onChange }: { value: number; onChange: (v: number) => void }) => (
   <div className="flex items-center gap-1 bg-white/[0.03] border border-white/10 rounded-xl p-1">
     {[10, 25, 50].map(n => (
-      <button
-        key={n}
-        type="button"
-        onClick={() => onChange(n)}
+      <button key={n} type="button" onClick={() => onChange(n)}
         className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all
-          ${value === n ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-300'}`}
-      >
+          ${value === n ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-300'}`}>
         {n}
       </button>
     ))}
@@ -223,18 +193,15 @@ const FilterPill = ({ label, value, color, onRemove }: {
   <span className={`flex items-center gap-1.5 pl-3 pr-2 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${color}`}>
     <span className="opacity-60">{label}:</span>
     <span>{value}</span>
-    <button
-      type="button"
-      onClick={onRemove}
-      className="ml-0.5 w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"
-    >
+    <button type="button" onClick={onRemove}
+      className="ml-0.5 w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all">
       <XMarkIcon className="w-2.5 h-2.5" />
     </button>
   </span>
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STATUS CONFIG + BADGE
+// STATUS + SOURCE BADGES
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_CFG: Record<string, { color: string; bg: string; border: string; dot: string }> = {
   new:       { color: 'text-indigo-400',  bg: 'bg-indigo-500/10',  border: 'border-indigo-500/20',  dot: 'bg-indigo-400'  },
@@ -255,9 +222,6 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SOURCE BADGE
-// ─────────────────────────────────────────────────────────────────────────────
 const SRC_CFG: Record<string, { label: string; cls: string }> = {
   vault:           { label: 'Vault',    cls: 'text-slate-400  border-slate-500/40'  },
   google_search:   { label: 'Google',   cls: 'text-blue-400   border-blue-500/40'   },
@@ -266,6 +230,7 @@ const SRC_CFG: Record<string, { label: string; cls: string }> = {
   linkedin_signal: { label: 'LinkedIn', cls: 'text-cyan-400   border-cyan-500/40'   },
   news_signal:     { label: 'News',     cls: 'text-amber-400  border-amber-500/40'  },
   ai_search:       { label: 'AI',       cls: 'text-violet-400 border-violet-500/40' },
+  csv_import:      { label: 'Imported', cls: 'text-emerald-400 border-emerald-500/40' },
 };
 const SourceBadge = ({ source }: { source?: string }) => {
   const c = SRC_CFG[source || ''] ?? SRC_CFG.ai_search;
@@ -277,9 +242,319 @@ const SourceBadge = ({ source }: { source?: string }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CRM EXPORT MODAL  (dashboard-specific — backend powered)
+//
+// Lives here rather than App.tsx because it reads niche/city from the
+// dashboard filter state directly.
+//
+// Calls GET /my-leads/export?format=xxx&niche=xxx&city=xxx&status=xxx
+// Backend returns a streaming file download.
+// ─────────────────────────────────────────────────────────────────────────────
+const DashboardExportModal = ({
+  onClose,
+  activeNiche,
+  activeCity,
+  activeStatus,
+  totalCount,
+  nicheOptions,
+  cityOptions,
+}: {
+  onClose: () => void;
+  activeNiche: string;
+  activeCity: string;
+  activeStatus: string;
+  totalCount: number;
+  nicheOptions: string[];
+  cityOptions: string[];
+}) => {
+  const [format,     setFormat]     = useState<'csv' | 'json' | 'hubspot' | 'salesforce'>('csv');
+  const [scope,      setScope]      = useState<'all' | 'filtered'>('all');
+  const [niche,      setNiche]      = useState('');
+  const [city,       setCity]       = useState('');
+  const [status,     setStatus]     = useState('');
+  const [exporting,  setExporting]  = useState(false);
+  const [done,       setDone]       = useState(false);
+  const [previewCount, setPreviewCount] = useState<number | null>(null);
+  const [countLoading, setCountLoading] = useState(false);
+
+  // When modal opens, pre-fill from active filters if user chose 'filtered'
+  useEffect(() => {
+    if (scope === 'filtered') {
+      setNiche(activeNiche);
+      setCity(activeCity);
+      setStatus(activeStatus);
+    } else {
+      setNiche('');
+      setCity('');
+      setStatus('');
+    }
+  }, [scope]);
+
+  // Live preview count
+  useEffect(() => {
+    setCountLoading(true);
+    const params = new URLSearchParams({ per_page: '1', page: '1' });
+    if (niche)  params.set('niche',  niche);
+    if (city)   params.set('city',   city);
+    if (status) params.set('status', status);
+
+    api.get(`/my-leads?${params.toString()}`)
+      .then(res => setPreviewCount(res.data.pagination?.total_count ?? 0))
+      .catch(() => setPreviewCount(null))
+      .finally(() => setCountLoading(false));
+  }, [niche, city, status]);
+
+  const FORMATS = [
+    { id: 'csv',        label: 'CSV',           sub: 'Universal — Excel / Google Sheets',  color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5'  },
+    { id: 'json',       label: 'JSON',           sub: 'All fields + deep audit data',       color: 'text-blue-400 border-blue-500/30 bg-blue-500/5'           },
+    { id: 'hubspot',    label: 'HubSpot CSV',    sub: 'Direct import — HubSpot contacts',   color: 'text-orange-400 border-orange-500/30 bg-orange-500/5'     },
+    { id: 'salesforce', label: 'Salesforce CSV', sub: 'Direct import — Salesforce leads',   color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5'           },
+  ] as const;
+
+  const FIELDS: Record<string, string> = {
+    csv:        'Name, Email, Phone, Website, City, Niche, Score, Status, Reasoning, Email Verified, Decision Maker',
+    json:       'All fields + verification status, deep audit, decision maker, social profiles, activity signals',
+    hubspot:    'First Name, Last Name, Email, Phone, Website URL, City, Industry, Lead Status, Notes, Score',
+    salesforce: 'Last Name, First Name, Email, Phone, Website, City, Industry, Lead Status, Description, Rating',
+  };
+
+  const HOW_TO: Record<string, { steps: string[]; link: string }> = {
+    hubspot: {
+      steps: ['Go to Contacts → Import', 'Choose "Import file from computer"', 'Select "Contacts" as object type', 'Upload CSV — columns map automatically', 'Review duplicates & confirm'],
+      link:  'https://knowledge.hubspot.com/crm-setup/how-to-import-contacts',
+    },
+    salesforce: {
+      steps: ['Go to Leads → Import', 'Select "Insert new records"', 'Upload CSV', 'Map columns (Last Name required)', 'Click Import Now'],
+      link:  'https://help.salesforce.com/s/articleView?id=sf.importing_crm_data.htm',
+    },
+  };
+
+  const nicheOpts  = [{ label: 'All Niches',    value: '' }, ...nicheOptions.map(n => ({ label: n, value: n }))];
+  const cityOpts   = [{ label: 'All Cities',    value: '' }, ...cityOptions.map(c  => ({ label: c, value: c }))];
+  const statusOpts = [
+    { label: 'All Statuses', value: '' },
+    ...Object.keys(STATUS_CFG).map(k => ({ label: k.charAt(0).toUpperCase() + k.slice(1), value: k })),
+  ];
+
+  const doExport = async () => {
+    setExporting(true);
+    try {
+      const params = new URLSearchParams({ format });
+      if (niche)  params.set('niche',  niche);
+      if (city)   params.set('city',   city);
+      if (status) params.set('status', status);
+
+      // Get JWT token — try both storage locations
+      const token = localStorage.getItem('access_token')
+        || sessionStorage.getItem('access_token')
+        || localStorage.getItem('token')
+        || '';
+
+      const response = await fetch(
+        `${(api.defaults as any).baseURL || ''}/my-leads/export?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error((err as any).error || `Export failed: ${response.status}`);
+      }
+
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename=(.+)/);
+      const filename = match ? match[1] : `intentiq-export.${format === 'json' ? 'json' : 'csv'}`;
+
+      const blob = await response.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setDone(true);
+      setTimeout(() => setDone(false), 3000);
+    } catch (err: any) {
+      alert(err.message || 'Export failed. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportCount = countLoading ? '…' : (previewCount ?? totalCount);
+
+  return (
+    <div
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg bg-[#0d0e14] border border-white/10 rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-white/5 flex items-center gap-4 shrink-0">
+          <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center">
+            <CloudArrowDownIcon className="w-5 h-5 text-indigo-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-bold text-base">Export Leads to CRM</h3>
+            <p className="text-slate-500 text-[10px]">Choose what to export and which format</p>
+          </div>
+          <button onClick={onClose} className="ml-auto text-slate-600 hover:text-white transition-colors text-xl leading-none">×</button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10">
+
+          {/* ── Scope: All vs Filtered ── */}
+          <div>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">What to export</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'all',      label: 'All my leads',       sub: 'Every lead in your account'         },
+                { id: 'filtered', label: 'Filtered selection', sub: 'Choose niche, city or status below' },
+              ].map(s => (
+                <button key={s.id} type="button" onClick={() => setScope(s.id as 'all' | 'filtered')}
+                  className={`p-4 rounded-2xl border text-left transition-all ${
+                    scope === s.id
+                      ? 'bg-indigo-500/10 border-indigo-500/40'
+                      : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                  }`}>
+                  <div className={`w-3.5 h-3.5 rounded-full border-2 mb-2 flex items-center justify-center ${scope === s.id ? 'border-indigo-400' : 'border-slate-600'}`}>
+                    {scope === s.id && <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />}
+                  </div>
+                  <p className={`font-bold text-[11px] ${scope === s.id ? 'text-white' : 'text-slate-400'}`}>{s.label}</p>
+                  <p className="text-[9px] text-slate-600 mt-0.5">{s.sub}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Filters (only visible when scope=filtered) ── */}
+          {scope === 'filtered' && (
+            <div className="p-4 bg-white/[0.02] rounded-2xl border border-white/5 space-y-3">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Filter Options</p>
+              <div className="flex flex-wrap gap-2">
+                <FilterSelect
+                  value={niche} onChange={setNiche}
+                  options={nicheOpts} placeholder="Niche"
+                  accentColor="indigo"
+                  icon={<QueueListIcon className="w-3.5 h-3.5" />}
+                />
+                <FilterSelect
+                  value={city} onChange={setCity}
+                  options={cityOpts} placeholder="City"
+                  accentColor="cyan"
+                  icon={<GlobeAltIcon className="w-3.5 h-3.5" />}
+                />
+                <FilterSelect
+                  value={status} onChange={setStatus}
+                  options={statusOpts} placeholder="Status"
+                  accentColor="amber"
+                  icon={<BoltIcon className="w-3.5 h-3.5" />}
+                />
+              </div>
+
+              {/* Active filter pills */}
+              {(niche || city || status) && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {niche  && <FilterPill label="Niche"  value={niche}  color="text-indigo-400 bg-indigo-500/10 border border-indigo-500/20" onRemove={() => setNiche('')}  />}
+                  {city   && <FilterPill label="City"   value={city}   color="text-cyan-400   bg-cyan-500/10   border border-cyan-500/20"   onRemove={() => setCity('')}   />}
+                  {status && <FilterPill label="Status" value={status} color="text-amber-400  bg-amber-500/10  border border-amber-500/20"  onRemove={() => setStatus('')} />}
+                  <button type="button" onClick={() => { setNiche(''); setCity(''); setStatus(''); }}
+                    className="text-[9px] font-black text-slate-600 hover:text-red-400 transition-colors uppercase tracking-widest flex items-center gap-1">
+                    <XMarkIcon className="w-3 h-3" /> Clear
+                  </button>
+                </div>
+              )}
+
+              {/* Live preview count */}
+              <div className="flex items-center gap-2 pt-1">
+                {countLoading
+                  ? <ArrowPathIcon className="w-3.5 h-3.5 text-slate-600 animate-spin" />
+                  : <span className="text-[9px] font-black text-slate-500">
+                      Matching leads: <span className="text-indigo-400">{previewCount ?? '—'}</span>
+                    </span>
+                }
+              </div>
+            </div>
+          )}
+
+          {/* ── Format picker ── */}
+          <div>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Export Format</p>
+            <div className="space-y-2">
+              {FORMATS.map(f => (
+                <button key={f.id} type="button" onClick={() => setFormat(f.id as any)}
+                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl border transition-all text-left ${
+                    format === f.id ? f.color + ' border-opacity-100' : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                  }`}>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${format === f.id ? 'border-current' : 'border-slate-600'}`}>
+                    {format === f.id && <div className="w-2 h-2 rounded-full bg-current" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-bold text-sm ${format === f.id ? 'text-white' : 'text-slate-400'}`}>{f.label}</p>
+                    <p className="text-[10px] text-slate-600 mt-0.5">{f.sub}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Fields preview */}
+          <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl">
+            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">Fields included</p>
+            <p className="text-[10px] text-slate-400 leading-relaxed">{FIELDS[format]}</p>
+          </div>
+
+          {/* Import instructions for HubSpot/Salesforce */}
+          {(format === 'hubspot' || format === 'salesforce') && HOW_TO[format] && (
+            <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
+              <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-2">
+                How to import into {format === 'hubspot' ? 'HubSpot' : 'Salesforce'}
+              </p>
+              <ol className="text-[10px] text-slate-500 space-y-1 list-decimal list-inside">
+                {HOW_TO[format].steps.map((s, i) => <li key={i}>{s}</li>)}
+              </ol>
+              <a href={HOW_TO[format].link} target="_blank" rel="noreferrer"
+                className="text-[9px] text-indigo-400 hover:text-indigo-300 font-bold mt-2 block transition-colors">
+                Official import guide →
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-white/5 shrink-0">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] text-slate-500">Leads to export</span>
+            <span className="text-[10px] font-black text-white flex items-center gap-1.5">
+              {countLoading
+                ? <ArrowPathIcon className="w-3.5 h-3.5 text-slate-600 animate-spin" />
+                : <>{exportCount} lead{Number(exportCount) !== 1 ? 's' : ''}</>}
+            </span>
+          </div>
+          <button onClick={doExport} disabled={exporting || done || exportCount === 0}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-40 shadow-lg shadow-indigo-600/20">
+            {exporting
+              ? <><ArrowPathIcon className="w-4 h-4 animate-spin" /> Preparing {format.toUpperCase()}…</>
+              : done
+              ? <><CheckCircleIcon className="w-4 h-4" /> Downloaded — check your folder!</>
+              : <><CloudArrowDownIcon className="w-4 h-4" /> Download {format.toUpperCase()} ({exportCount} leads)</>}
+          </button>
+          <button onClick={onClose}
+            className="mt-3 w-full text-slate-600 text-[9px] font-bold uppercase tracking-widest hover:text-white transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // LEAD DETAIL PANEL
-// Shown on the right side (desktop) or bottom sheet (mobile) when a row is
-// clicked. Contains all enriched contact info, signals, and audit data.
 // ─────────────────────────────────────────────────────────────────────────────
 const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void }) => {
   const scoreColor =
@@ -292,30 +567,22 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
     lead.score >= 40 ? 'border-amber-500/30   bg-amber-500/5'   :
     'border-red-500/30 bg-red-500/5';
 
-  const dm          = (lead as any).decision_maker;
-  const reasoning   = (lead as any).reasoning;
+  const dm           = (lead as any).decision_maker;
+  const reasoning    = (lead as any).reasoning;
   const auditSummary = (lead as any).deep_audit_summary;
-  const source      = (lead as any).source;
+  const source       = (lead as any).source;
 
   return (
     <div className="flex flex-col h-full bg-[#0a0b10]">
-
-      {/* ── Panel header ── */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] bg-black/30 shrink-0">
         <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Lead Detail</p>
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-500 hover:text-white transition-all"
-        >
+        <button type="button" onClick={onClose}
+          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-500 hover:text-white transition-all">
           <XMarkIcon className="w-4 h-4" />
         </button>
       </div>
 
-      {/* ── Scrollable body ── */}
       <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-white/10">
-
-        {/* Company name + score */}
         <div className="px-5 pt-5 pb-4 border-b border-white/[0.06]">
           <div className="flex items-start gap-3 mb-3">
             <div className="flex-1 min-w-0">
@@ -325,14 +592,11 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
                 {source && <SourceBadge source={source} />}
               </div>
             </div>
-            {/* Score ring */}
             <div className={`shrink-0 flex flex-col items-center justify-center w-14 h-14 rounded-2xl border ${scoreBorder}`}>
               <span className={`text-xl font-black leading-none ${scoreColor}`}>{lead.score}</span>
               <span className="text-[8px] text-slate-600 font-bold uppercase mt-0.5">score</span>
             </div>
           </div>
-
-          {/* Niche + city tags */}
           <div className="flex flex-wrap gap-1.5 mt-2">
             {lead.niche && (
               <span className="flex items-center gap-1 px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-[9px] font-black uppercase tracking-widest">
@@ -347,11 +611,8 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
           </div>
         </div>
 
-        {/* Contact info */}
         <div className="px-5 py-4 border-b border-white/[0.06] space-y-3">
           <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.15em]">Contact</p>
-
-          {/* Website */}
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
               <LinkIcon className="w-3.5 h-3.5 text-slate-600" />
@@ -365,33 +626,24 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
               <span className="text-[11px] text-slate-600 italic">No website</span>
             )}
           </div>
-
-          {/* Email */}
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
               <EnvelopeIcon className="w-3.5 h-3.5 text-slate-600" />
             </div>
-            {lead.email ? (
-              <span className="text-[11px] text-slate-300 truncate flex-1">{lead.email}</span>
-            ) : (
-              <span className="text-[11px] text-slate-600 italic">No email</span>
-            )}
+            {lead.email
+              ? <span className="text-[11px] text-slate-300 truncate flex-1">{lead.email}</span>
+              : <span className="text-[11px] text-slate-600 italic">No email</span>}
           </div>
-
-          {/* Phone */}
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
               <PhoneIcon className="w-3.5 h-3.5 text-slate-600" />
             </div>
-            {lead.phone_number ? (
-              <span className="text-[11px] text-slate-300">{lead.phone_number}</span>
-            ) : (
-              <span className="text-[11px] text-slate-600 italic">No phone</span>
-            )}
+            {lead.phone_number
+              ? <span className="text-[11px] text-slate-300">{lead.phone_number}</span>
+              : <span className="text-[11px] text-slate-600 italic">No phone</span>}
           </div>
         </div>
 
-        {/* Signal / reasoning */}
         {reasoning && (
           <div className="px-5 py-4 border-b border-white/[0.06]">
             <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] mb-2">Signal</p>
@@ -399,7 +651,6 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
           </div>
         )}
 
-        {/* Decision maker (from deep audit) */}
         {dm?.name && (
           <div className="px-5 py-4 border-b border-white/[0.06]">
             <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] mb-3">Decision Maker</p>
@@ -412,16 +663,13 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
                 {dm.title && <p className="text-[10px] text-indigo-400 font-bold mt-0.5">{dm.title}</p>}
                 {dm.linkedin_url && (
                   <a href={dm.linkedin_url} target="_blank" rel="noreferrer"
-                    className="text-[9px] text-cyan-400 hover:text-cyan-300 font-bold mt-0.5 block transition-colors">
-                    LinkedIn →
-                  </a>
+                    className="text-[9px] text-cyan-400 hover:text-cyan-300 font-bold mt-0.5 block transition-colors">LinkedIn →</a>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Audit summary */}
         {auditSummary && (
           <div className="px-5 py-4 border-b border-white/[0.06]">
             <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] mb-2">Audit Summary</p>
@@ -429,7 +677,6 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
           </div>
         )}
 
-        {/* Meta */}
         <div className="px-5 py-4">
           <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.15em] mb-3">Meta</p>
           <div className="space-y-2">
@@ -445,7 +692,6 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
@@ -475,26 +721,21 @@ const UserDashboard = ({
   const [pagination, setPagination]         = useState<LeadsPagination | null>(null);
   const [isLoadingLeads, setIsLoadingLeads] = useState(false);
   const [leadsError, setLeadsError]         = useState<string | null>(null);
-
-  // ── KEY STATE: which lead is selected in the table ────────────────────────
-  // This drives the entire split-panel behaviour.
-  // null  → no panel, table uses full width
-  // MyLead → panel slides in on the right (desktop) / bottom (mobile)
-  const [selectedLead, setSelectedLead] = useState<MyLead | null>(null);
-
+  const [selectedLead, setSelectedLead]     = useState<MyLead | null>(null);
   const [filters, setFilters]               = useState<LeadFilters>({ page: 1, per_page: 10, sort_by: 'created_at', order: 'desc' });
   const [nicheOptions, setNicheOptions]     = useState<string[]>([]);
   const [cityOptions, setCityOptions]       = useState<string[]>([]);
   const [stats, setStats]                   = useState<DashboardStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
 
+  // ── Export modal state ────────────────────────────────────────────────────
+  const [showExport, setShowExport] = useState(false);
+
   const detailScrollRef = useRef<HTMLDivElement>(null);
+  const planInfo        = currentUser?.plan_info ?? null;
+  const isTrialExpired  = planInfo?.trial_expired === true;
+  const panelOpen       = selectedLead !== null;
 
-  const planInfo       = currentUser?.plan_info ?? null;
-  const isTrialExpired = planInfo?.trial_expired === true;
-  const panelOpen      = selectedLead !== null;
-
-  // Fetch dashboard stats once
   useEffect(() => {
     const run = async () => {
       setIsLoadingStats(true);
@@ -505,7 +746,6 @@ const UserDashboard = ({
     run();
   }, []);
 
-  // Fetch leads whenever filters change (and we're on the leads tab)
   const fetchLeads = useCallback(async () => {
     setIsLoadingLeads(true);
     setLeadsError(null);
@@ -530,14 +770,10 @@ const UserDashboard = ({
     if (activeTab === 'leads') fetchLeads();
   }, [activeTab, fetchLeads]);
 
-  // If selected lead disappears (page change), close panel
   useEffect(() => {
-    if (selectedLead && !myLeads.find(l => l.id === selectedLead.id)) {
-      setSelectedLead(null);
-    }
+    if (selectedLead && !myLeads.find(l => l.id === selectedLead.id)) setSelectedLead(null);
   }, [myLeads]);
 
-  // Scroll panel to top when selection changes
   useEffect(() => {
     detailScrollRef.current?.scrollTo({ top: 0 });
   }, [selectedLead?.id]);
@@ -558,14 +794,11 @@ const UserDashboard = ({
     onNavigate('/setup');
   };
 
-  // ── Row click handler ─────────────────────────────────────────────────────
-  // Clicking the same row again closes the panel (toggle behaviour).
-  const handleRowClick = (lead: MyLead) => {
+  const handleRowClick = (lead: MyLead) =>
     setSelectedLead(prev => prev?.id === lead.id ? null : lead);
-  };
 
   const nicheOpts  = [{ label: 'All Niches',    value: '' }, ...nicheOptions.map(n => ({ label: n, value: n }))];
-  const cityOpts   = [{ label: 'All Cities',    value: '' }, ...cityOptions.map(c => ({ label: c, value: c }))];
+  const cityOpts   = [{ label: 'All Cities',    value: '' }, ...cityOptions.map(c  => ({ label: c, value: c }))];
   const statusOpts = [
     { label: 'All Statuses', value: '' },
     ...Object.keys(STATUS_CFG).map(k => ({ label: k.charAt(0).toUpperCase() + k.slice(1), value: k })),
@@ -574,11 +807,24 @@ const UserDashboard = ({
   return (
     <div className="max-w-[1400px] w-full py-6 md:py-10 animate-in fade-in duration-500">
 
+      {/* Export modal */}
+      {showExport && (
+        <DashboardExportModal
+          onClose={() => setShowExport(false)}
+          activeNiche={filters.niche || ''}
+          activeCity={filters.city   || ''}
+          activeStatus={filters.status || ''}
+          totalCount={pagination?.total_count ?? 0}
+          nicheOptions={nicheOptions}
+          cityOptions={cityOptions}
+        />
+      )}
+
       {planInfo && !currentUser?.is_admin && (
         <TrialBanner planInfo={planInfo} onUpgrade={() => onNavigate('/pricing')} />
       )}
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
         <div>
           <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter mb-1">Control Center</h2>
@@ -600,13 +846,10 @@ const UserDashboard = ({
             )}
           </div>
           <div className="flex-1 md:flex-none flex flex-col items-stretch gap-1">
-            <button
-              type="button"
-              onClick={handleNewHunt}
+            <button type="button" onClick={handleNewHunt}
               disabled={isTrialExpired && !currentUser?.is_admin}
               className={`bg-indigo-600 text-white font-bold px-4 md:px-8 py-3 md:py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/10 text-xs md:text-sm
-                ${isTrialExpired && !currentUser?.is_admin ? 'opacity-40 cursor-not-allowed' : 'hover:bg-indigo-500'}`}
-            >
+                ${isTrialExpired && !currentUser?.is_admin ? 'opacity-40 cursor-not-allowed' : 'hover:bg-indigo-500'}`}>
               <PlusIcon className="w-4 h-4 md:w-5 md:h-5" />
               <span>New Hunt</span>
             </button>
@@ -617,28 +860,22 @@ const UserDashboard = ({
         </div>
       </div>
 
-      {/* ── Tabs ── */}
+      {/* Tabs */}
       <div className="flex border-b border-white/5 mb-8">
         {([
           { key: 'overview', label: 'Overview' },
           { key: 'leads',    label: `My Leads${pagination ? ` (${pagination.total_count})` : ''}` },
         ] as { key: DashTab; label: string }[]).map(tab => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
+          <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)}
             className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative
-              ${activeTab === tab.key ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}
-          >
+              ${activeTab === tab.key ? 'text-white' : 'text-slate-600 hover:text-slate-400'}`}>
             {tab.label}
             {activeTab === tab.key && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500" />}
           </button>
         ))}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          OVERVIEW TAB
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* ══ OVERVIEW TAB ══════════════════════════════════════════════════════ */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
           {isLoadingStats ? (
@@ -647,13 +884,12 @@ const UserDashboard = ({
             </div>
           ) : (
             <>
-              {/* Stat cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: 'Total Leads', val: stats?.stats.total_leads ?? 0,                       sub: `${stats?.stats.leads_this_month ?? 0} this month`,               color: 'text-indigo-400',  icon: <QueueListIcon  className="w-6 h-6" /> },
-                  { label: 'Contacted',   val: stats?.stats.status_breakdown?.contacted ?? 0,       sub: `${stats?.stats.status_breakdown?.replied ?? 0} replied`,           color: 'text-amber-400',   icon: <EnvelopeIcon   className="w-6 h-6" /> },
-                  { label: 'Qualified',   val: stats?.stats.status_breakdown?.qualified ?? 0,       sub: `${stats?.stats.status_breakdown?.rejected ?? 0} rejected`,         color: 'text-emerald-400', icon: <CheckBadgeIcon className="w-6 h-6" /> },
-                  { label: 'Vault Size',  val: stats?.stats.vault_total ?? 0,                       sub: 'global leads indexed',                                               color: 'text-cyan-400',    icon: <CircleStackIcon className="w-6 h-6" /> },
+                  { label: 'Total Leads', val: stats?.stats.total_leads ?? 0,                  sub: `${stats?.stats.leads_this_month ?? 0} this month`,       color: 'text-indigo-400',  icon: <QueueListIcon   className="w-6 h-6" /> },
+                  { label: 'Contacted',   val: stats?.stats.status_breakdown?.contacted ?? 0,  sub: `${stats?.stats.status_breakdown?.replied ?? 0} replied`,   color: 'text-amber-400',   icon: <EnvelopeIcon    className="w-6 h-6" /> },
+                  { label: 'Qualified',   val: stats?.stats.status_breakdown?.qualified ?? 0,  sub: `${stats?.stats.status_breakdown?.rejected ?? 0} rejected`,  color: 'text-emerald-400', icon: <CheckBadgeIcon  className="w-6 h-6" /> },
+                  { label: 'Vault Size',  val: stats?.stats.vault_total ?? 0,                  sub: 'global leads indexed',                                      color: 'text-cyan-400',    icon: <CircleStackIcon className="w-6 h-6" /> },
                 ].map((s, i) => (
                   <div key={i} className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl">
                     <div className={`w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center ${s.color} mb-4`}>{s.icon}</div>
@@ -665,11 +901,11 @@ const UserDashboard = ({
               </div>
 
               <div className="grid grid-cols-12 gap-6">
-                {/* Recent leads */}
                 <div className="col-span-12 lg:col-span-7 bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
                   <div className="p-6 border-b border-white/5 flex items-center justify-between">
                     <h3 className="text-white font-bold">Recent Leads</h3>
-                    <button type="button" onClick={() => setActiveTab('leads')} className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:text-white transition-all">
+                    <button type="button" onClick={() => setActiveTab('leads')}
+                      className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:text-white transition-all">
                       View All →
                     </button>
                   </div>
@@ -691,9 +927,7 @@ const UserDashboard = ({
                   </div>
                 </div>
 
-                {/* Right column */}
                 <div className="col-span-12 lg:col-span-5 space-y-4">
-                  {/* Pipeline */}
                   <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6">
                     <h3 className="text-white font-bold mb-5">Pipeline Breakdown</h3>
                     <div className="space-y-3">
@@ -720,7 +954,6 @@ const UserDashboard = ({
                     </div>
                   </div>
 
-                  {/* Top niches */}
                   <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6">
                     <h3 className="text-white font-bold mb-4">Top Niches</h3>
                     <div className="space-y-2">
@@ -737,7 +970,6 @@ const UserDashboard = ({
                     </div>
                   </div>
 
-                  {/* Top cities */}
                   <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6">
                     <h3 className="text-white font-bold mb-4">Top Cities</h3>
                     <div className="space-y-2">
@@ -756,7 +988,6 @@ const UserDashboard = ({
                 </div>
               </div>
 
-              {/* Plan card */}
               <div className={`p-8 rounded-3xl shadow-xl text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6
                 ${isTrialExpired && !currentUser?.is_admin
                   ? 'bg-red-900/40 border border-red-500/20 shadow-red-900/20'
@@ -772,7 +1003,8 @@ const UserDashboard = ({
                       : `${stats?.user.credits ?? 0} credits remaining`}
                   </p>
                 </div>
-                <button type="button" onClick={() => onNavigate('/pricing')} className="bg-white text-indigo-700 font-black px-6 py-3 rounded-2xl text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all">
+                <button type="button" onClick={() => onNavigate('/pricing')}
+                  className="bg-white text-indigo-700 font-black px-6 py-3 rounded-2xl text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all">
                   {isTrialExpired ? 'Upgrade Now' : 'Upgrade Plan'}
                 </button>
               </div>
@@ -781,21 +1013,7 @@ const UserDashboard = ({
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          MY LEADS TAB  —  Google-Images-style split panel
-          ──────────────────────────────────────────────────────────────────
-          HOW IT WORKS:
-          • Outer container is `flex` with no gap.
-          • Left side (table) always renders, but its width shrinks from
-            100% → 55% on desktop when a lead is selected.
-          • Right side (detail panel) only renders when `panelOpen === true`.
-            On desktop it's a sticky column at 45% width.
-            On mobile it renders as a fixed bottom sheet overlay.
-          • Clicking a row calls handleRowClick(lead).
-            Clicking the same row again (or the × button) closes the panel.
-          • All filter/sort/pagination controls sit above the split container
-            and always occupy full width.
-      ══════════════════════════════════════════════════════════════════════ */}
+      {/* ══ MY LEADS TAB ══════════════════════════════════════════════════════ */}
       {activeTab === 'leads' && (
         <div className="space-y-4">
 
@@ -809,9 +1027,9 @@ const UserDashboard = ({
                   <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[8px] font-black flex items-center justify-center">{activeFilterCount}</span>
                 )}
               </div>
-              <FilterSelect value={filters.niche || ''} onChange={v => updateFilter('niche', v)} options={nicheOpts} placeholder="Niche" accentColor="indigo" icon={<QueueListIcon className="w-3.5 h-3.5" />} />
-              <FilterSelect value={filters.city  || ''} onChange={v => updateFilter('city',  v)} options={cityOpts}  placeholder="City"  accentColor="cyan"   icon={<GlobeAltIcon  className="w-3.5 h-3.5" />} />
-              <FilterSelect value={filters.status || ''} onChange={v => updateFilter('status',v)} options={statusOpts} placeholder="Status" accentColor="amber" icon={<BoltIcon className="w-3.5 h-3.5" />} />
+              <FilterSelect value={filters.niche  || ''} onChange={v => updateFilter('niche',  v)} options={nicheOpts}  placeholder="Niche"  accentColor="indigo" icon={<QueueListIcon className="w-3.5 h-3.5" />} />
+              <FilterSelect value={filters.city   || ''} onChange={v => updateFilter('city',   v)} options={cityOpts}   placeholder="City"   accentColor="cyan"   icon={<GlobeAltIcon  className="w-3.5 h-3.5" />} />
+              <FilterSelect value={filters.status || ''} onChange={v => updateFilter('status', v)} options={statusOpts} placeholder="Status" accentColor="amber"  icon={<BoltIcon      className="w-3.5 h-3.5" />} />
               <div className="w-px h-5 bg-white/10 mx-1" />
               <PerPageToggle value={filters.per_page || 10} onChange={v => updateFilter('per_page', v)} />
               <SortToggle
@@ -819,6 +1037,16 @@ const UserDashboard = ({
                 order={filters.order   || 'desc'}
                 onChange={(s, o) => setFilters(prev => ({ ...prev, sort_by: s as any, order: o as any, page: 1 }))}
               />
+
+              {/* ── EXPORT BUTTON — lives here in My Leads tab only ── */}
+              <button
+                type="button"
+                onClick={() => setShowExport(true)}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all"
+              >
+                <CloudArrowDownIcon className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Export CRM</span>
+              </button>
             </div>
 
             {hasActiveFilters && (
@@ -835,27 +1063,18 @@ const UserDashboard = ({
             )}
           </div>
 
-          {/* ── SPLIT PANEL WRAPPER ─────────────────────────────────────────
-              Uses flex layout so the two sides sit side-by-side.
-              The table side animates its width, the panel side fades in.
-          ─────────────────────────────────────────────────────────────────── */}
+          {/* Split panel */}
           <div className="flex rounded-2xl border border-white/[0.06] overflow-hidden min-h-[300px]">
 
-            {/* LEFT: table — shrinks to 55% when panel is open on desktop */}
-            <div
-              className="flex flex-col bg-white/[0.02] transition-all duration-300"
-              style={{ width: panelOpen ? 'min(55%, 100%)' : '100%' }}
-            >
+            {/* Left: table */}
+            <div className="flex flex-col bg-white/[0.02] transition-all duration-300"
+              style={{ width: panelOpen ? 'min(55%, 100%)' : '100%' }}>
 
-              {/* Table header */}
               {!isLoadingLeads && myLeads.length > 0 && (
                 <div className={`grid px-4 py-3 border-b border-white/[0.06] bg-black/20 text-[9px] font-black text-slate-600 uppercase tracking-widest
                   ${panelOpen ? 'grid-cols-[1fr_auto]' : 'grid-cols-12'} gap-3`}>
                   {panelOpen ? (
-                    <>
-                      <span>Company</span>
-                      <span className="text-right">Status</span>
-                    </>
+                    <><span>Company</span><span className="text-right">Status</span></>
                   ) : (
                     <>
                       <span className="col-span-4">Company</span>
@@ -869,19 +1088,14 @@ const UserDashboard = ({
                 </div>
               )}
 
-              {/* Loading */}
               {isLoadingLeads && (
                 <div className="flex items-center justify-center py-16 flex-1">
                   <ArrowPathIcon className="w-6 h-6 text-indigo-500 animate-spin" />
                 </div>
               )}
-
-              {/* Error */}
               {leadsError && !isLoadingLeads && (
                 <div className="p-8 text-center text-red-400 text-sm flex-1">{leadsError}</div>
               )}
-
-              {/* Empty */}
               {!isLoadingLeads && !leadsError && myLeads.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-16 flex-1">
                   <MagnifyingGlassIcon className="w-10 h-10 text-slate-700 mb-4" />
@@ -891,27 +1105,14 @@ const UserDashboard = ({
                 </div>
               )}
 
-              {/* ── ROWS ────────────────────────────────────────────────────
-                  Each row is a <div> with onClick that calls handleRowClick.
-                  The pointer-cursor and hover background confirm it's clickable.
-                  Selected row gets an indigo left border + background tint.
-              ─────────────────────────────────────────────────────────────── */}
-              {!isLoadingLeads && !leadsError && myLeads.map((lead) => {
+              {!isLoadingLeads && !leadsError && myLeads.map(lead => {
                 const isSelected = selectedLead?.id === lead.id;
                 return (
-                  <div
-                    key={lead.id}
-                    onClick={() => handleRowClick(lead)}
-                    className={`
-                      border-b border-white/[0.05] last:border-b-0
-                      cursor-pointer select-none transition-colors duration-100
+                  <div key={lead.id} onClick={() => handleRowClick(lead)}
+                    className={`border-b border-white/[0.05] last:border-b-0 cursor-pointer select-none transition-colors duration-100
                       ${isSelected
                         ? 'bg-indigo-500/10 border-l-2 border-l-indigo-500'
-                        : 'border-l-2 border-l-transparent hover:bg-white/[0.025]'
-                      }
-                    `}
-                  >
-                    {/* ── COMPACT view (panel open) ── */}
+                        : 'border-l-2 border-l-transparent hover:bg-white/[0.025]'}`}>
                     {panelOpen ? (
                       <div className="flex items-center justify-between gap-3 px-4 py-3.5">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -929,7 +1130,6 @@ const UserDashboard = ({
                         </div>
                       </div>
                     ) : (
-                      /* ── FULL view (panel closed) ── */
                       <div className="grid grid-cols-12 gap-3 px-4 py-4 items-center">
                         <div className="col-span-4 min-w-0">
                           <p className="text-white font-bold text-sm truncate">{lead.name}</p>
@@ -974,34 +1174,22 @@ const UserDashboard = ({
               })}
             </div>
 
-            {/* RIGHT: detail panel — desktop sticky sidebar
-                Only rendered when a lead is selected.
-                `sticky top-16 self-start` keeps it in view while scrolling. */}
+            {/* Right: detail panel */}
             {panelOpen && (
-              <div
-                ref={detailScrollRef}
+              <div ref={detailScrollRef}
                 className="hidden lg:flex flex-col border-l border-white/[0.06] sticky top-16 self-start overflow-y-auto"
-                style={{ width: '45%', maxHeight: 'calc(100vh - 80px)' }}
-              >
+                style={{ width: '45%', maxHeight: 'calc(100vh - 80px)' }}>
                 <LeadDetailPanel lead={selectedLead!} onClose={() => setSelectedLead(null)} />
               </div>
             )}
           </div>
 
-          {/* MOBILE bottom sheet — slides up over the table */}
+          {/* Mobile bottom sheet */}
           {panelOpen && (
             <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
-              {/* Dim backdrop — click to close */}
-              <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={() => setSelectedLead(null)}
-              />
-              {/* Sheet */}
-              <div
-                className="relative bg-[#0d0e14] border-t border-white/10 rounded-t-3xl flex flex-col shadow-2xl"
-                style={{ maxHeight: '82vh', animation: 'slideUp 0.22s ease-out' }}
-              >
-                {/* Drag handle visual */}
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedLead(null)} />
+              <div className="relative bg-[#0d0e14] border-t border-white/10 rounded-t-3xl flex flex-col shadow-2xl"
+                style={{ maxHeight: '82vh', animation: 'slideUp 0.22s ease-out' }}>
                 <div className="flex justify-center pt-3 pb-1 shrink-0">
                   <div className="w-10 h-1 rounded-full bg-white/20" />
                 </div>
@@ -1049,14 +1237,12 @@ const UserDashboard = ({
         </div>
       )}
 
-      {/* Mobile bottom-sheet animation */}
       <style>{`
         @keyframes slideUp {
           from { transform: translateY(100%); opacity: 0; }
           to   { transform: translateY(0);    opacity: 1; }
         }
       `}</style>
-
     </div>
   );
 };

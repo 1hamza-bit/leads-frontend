@@ -1469,12 +1469,12 @@ const App: React.FC = () => {
                             )}
                           </h3>
                             {/* Export button */}
-                            {leads.length > 0 && (
+                            {/* {leads.length > 0 && (
                               <button onClick={() => setShowExport(true)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all">
                                 <CloudArrowDownIcon className="w-3.5 h-3.5" /> Export
                               </button>
-                            )}
+                            )} */}
                           <button onClick={() => {
                             setLeads([]);
                             setSelectedLead(null);
