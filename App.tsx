@@ -25,6 +25,7 @@ import LandingView from './src/components/landing';
 import MarketSetupView from './src/components/marketCriterea';
 import api from './src/components/api';
 import { VerificationResult, verifyLeads } from './src/services/authService';
+import { Analytics } from '@vercel/analytics/react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -1714,6 +1715,7 @@ const App: React.FC = () => {
           <CookieConsent onManage={() => navigate('/privacy')} />
         </div>
       )}
+      <Analytics />
     </>
   );
 };
