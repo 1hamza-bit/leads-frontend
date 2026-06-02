@@ -125,8 +125,8 @@ const CircularProgress = ({
   value: number; size?: number; strokeWidth?: number;
   label?: React.ReactNode; sublabel?: string; color?: string; isSpinning?: boolean;
 }) => {
-  const r   = (size - strokeWidth) / 2;
-  const c   = 2 * Math.PI * r;
+  const r = (size - strokeWidth) / 2;
+  const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
   const [animPct, setAnimPct] = useState(0);
   useEffect(() => { const t = setTimeout(() => setAnimPct(pct), 80); return () => clearTimeout(t); }, [pct]);
@@ -154,14 +154,14 @@ const CircularProgress = ({
 // ─── Email Status Badge ──────────────────────────────────────────────────────
 
 const EMAIL_STATUS: Record<string, { label: string; color: string; bg: string }> = {
-  verified:        { label: 'Verified',   color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
-  probable:        { label: 'Probable',   color: 'text-amber-400',   bg: 'bg-amber-500/10 border-amber-500/30'   },
-  mx_verified:     { label: 'MX OK',      color: 'text-blue-400',    bg: 'bg-blue-500/10 border-blue-500/30'     },
-  catchall_server: { label: 'Catch-All',  color: 'text-amber-400',   bg: 'bg-amber-500/10 border-amber-500/30'   },
-  undeliverable:   { label: 'Bad Email',  color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
-  no_mx_record:    { label: 'No MX',      color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
-  invalid_format:  { label: 'Invalid',    color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
-  disposable:      { label: 'Disposable', color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/30'       },
+  verified: { label: 'Verified', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+  probable: { label: 'Probable', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+  mx_verified: { label: 'MX OK', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+  catchall_server: { label: 'Catch-All', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+  undeliverable: { label: 'Bad Email', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+  no_mx_record: { label: 'No MX', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+  invalid_format: { label: 'Invalid', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+  disposable: { label: 'Disposable', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
 };
 
 const EmailStatusBadge = ({ status }: { status?: string }) => {
@@ -183,13 +183,13 @@ const WebsiteBadge = ({ isLive, httpStatus }: { isLive?: boolean; httpStatus?: n
 // ─── Source Badge ────────────────────────────────────────────────────────────
 
 const SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
-  vault:           { label: 'Vault',     color: 'text-slate-400 border-slate-600'   },
-  google_search:   { label: 'Google',    color: 'text-blue-400 border-blue-600'     },
-  facebook_graph:  { label: 'Facebook',  color: 'text-indigo-400 border-indigo-600' },
-  facebook_gemini: { label: 'Facebook',  color: 'text-indigo-400 border-indigo-600' },
-  linkedin_signal: { label: 'LinkedIn',  color: 'text-cyan-400 border-cyan-600'     },
-  news_signal:     { label: 'News',      color: 'text-amber-400 border-amber-600'   },
-  ai_search:       { label: 'AI Search', color: 'text-violet-400 border-violet-600' },
+  vault: { label: 'Vault', color: 'text-slate-400 border-slate-600' },
+  google_search: { label: 'Google', color: 'text-blue-400 border-blue-600' },
+  facebook_graph: { label: 'Facebook', color: 'text-indigo-400 border-indigo-600' },
+  facebook_gemini: { label: 'Facebook', color: 'text-indigo-400 border-indigo-600' },
+  linkedin_signal: { label: 'LinkedIn', color: 'text-cyan-400 border-cyan-600' },
+  news_signal: { label: 'News', color: 'text-amber-400 border-amber-600' },
+  ai_search: { label: 'AI Search', color: 'text-violet-400 border-violet-600' },
 };
 
 const SourceBadge = ({ source }: { source?: string }) => {
@@ -245,7 +245,7 @@ const RejectionModal = ({
 }: {
   leadId: string; onClose: () => void; onSuccess: (status: string) => void;
 }) => {
-  const [reason, setReason]   = useState('');
+  const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
 
   const submit = async (status: 'rejected' | 'qualified') => {
@@ -307,10 +307,10 @@ const RejectionModal = ({
 const DeepAuditPanel = ({ audit }: { audit: any }) => {
   if (!audit) return null;
 
-  const dm       = audit.decision_maker;
-  const socials  = audit.social_profiles;
-  const signals  = audit.activity_signals || [];
-  const updates  = audit.update_summary   || [];
+  const dm = audit.decision_maker;
+  const socials = audit.social_profiles;
+  const signals = audit.activity_signals || [];
+  const updates = audit.update_summary || [];
 
   return (
     <motion.div
@@ -441,7 +441,7 @@ const DeepAuditPanel = ({ audit }: { audit: any }) => {
 //
 // When scope='session' the backend is still called with the current lead IDs
 // as a filter so the export still includes full DB data (verification etc).
- 
+
 const CRMExportModal = ({
   leads,
   scope = 'all',
@@ -455,84 +455,84 @@ const CRMExportModal = ({
   filterCity?: string;
   onClose: () => void;
 }) => {
-  const [format, setFormat]   = useState<'csv' | 'json' | 'hubspot' | 'salesforce'>('csv');
-  const [status, setStatus]   = useState<'all' | 'new' | 'contacted' | 'qualified' | 'verified'>('all');
+  const [format, setFormat] = useState<'csv' | 'json' | 'hubspot' | 'salesforce'>('csv');
+  const [status, setStatus] = useState<'all' | 'new' | 'contacted' | 'qualified' | 'verified'>('all');
   const [exporting, setExporting] = useState(false);
-  const [done, setDone]       = useState(false);
+  const [done, setDone] = useState(false);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(false);
- 
+
   const FORMATS = [
-    { id: 'csv',        label: 'CSV',           sub: 'Universal — opens in Excel/Sheets',   color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5'  },
-    { id: 'json',       label: 'JSON',           sub: 'All fields incl. deep audit data',    color: 'text-blue-400 border-blue-500/30 bg-blue-500/5'           },
-    { id: 'hubspot',    label: 'HubSpot CSV',    sub: 'Direct import — HubSpot contacts',    color: 'text-orange-400 border-orange-500/30 bg-orange-500/5'     },
-    { id: 'salesforce', label: 'Salesforce CSV', sub: 'Direct import — Salesforce leads',    color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5'           },
+    { id: 'csv', label: 'CSV', sub: 'Universal — opens in Excel/Sheets', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5' },
+    { id: 'json', label: 'JSON', sub: 'All fields incl. deep audit data', color: 'text-blue-400 border-blue-500/30 bg-blue-500/5' },
+    { id: 'hubspot', label: 'HubSpot CSV', sub: 'Direct import — HubSpot contacts', color: 'text-orange-400 border-orange-500/30 bg-orange-500/5' },
+    { id: 'salesforce', label: 'Salesforce CSV', sub: 'Direct import — Salesforce leads', color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5' },
   ] as const;
- 
+
   const STATUSES = [
-    { id: 'all',       label: 'All leads'      },
-    { id: 'new',       label: 'New only'       },
-    { id: 'contacted', label: 'Contacted'      },
-    { id: 'qualified', label: 'Qualified'      },
-    { id: 'verified',  label: 'Verified only'  },
+    { id: 'all', label: 'All leads' },
+    { id: 'new', label: 'New only' },
+    { id: 'contacted', label: 'Contacted' },
+    { id: 'qualified', label: 'Qualified' },
+    { id: 'verified', label: 'Verified only' },
   ] as const;
- 
+
   // Preview count — how many leads will be exported
   useEffect(() => {
     setCountLoading(true);
     const params = new URLSearchParams({ format: 'json' });
     if (status !== 'all') params.set('status', status);
     if (filterNiche) params.set('niche', filterNiche);
-    if (filterCity)  params.set('city',  filterCity);
- 
+    if (filterCity) params.set('city', filterCity);
+
     api.get(`/my-leads?${params.toString()}&per_page=1`)
       .then(res => setTotalCount(res.data.pagination?.total_count ?? null))
       .catch(() => setTotalCount(scope === 'session' ? leads.length : null))
       .finally(() => setCountLoading(false));
   }, [status, filterNiche, filterCity]);
- 
+
   const FIELD_LABELS: Record<string, string> = {
-    csv:        'Name, Email, Phone, Website, City, Niche, Score, Status, Reasoning, Email Verified, Website Live, Decision Maker',
-    json:       'All fields including deep audit, decision maker, social profiles, activity signals',
-    hubspot:    'First Name, Last Name, Email, Phone, Website URL, City, Industry, Lead Status, Notes, Score, Email Verified',
+    csv: 'Name, Email, Phone, Website, City, Niche, Score, Status, Reasoning, Email Verified, Website Live, Decision Maker',
+    json: 'All fields including deep audit, decision maker, social profiles, activity signals',
+    hubspot: 'First Name, Last Name, Email, Phone, Website URL, City, Industry, Lead Status, Notes, Score, Email Verified',
     salesforce: 'Last Name, First Name, Email, Phone, Website, City, Industry, Lead Status, Description, Rating (Hot/Warm/Cold)',
   };
- 
+
   const doExport = async () => {
     setExporting(true);
     try {
       // Build URL with filters
       const params = new URLSearchParams({ format });
-      if (status !== 'all')  params.set('status', status);
-      if (filterNiche)       params.set('niche', filterNiche);
-      if (filterCity)        params.set('city',  filterCity);
- 
+      if (status !== 'all') params.set('status', status);
+      if (filterNiche) params.set('niche', filterNiche);
+      if (filterCity) params.set('city', filterCity);
+
       // Call the backend — it returns a file directly
-      const token    = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || '';
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || '';
       const response = await fetch(`${api.defaults.baseURL || ''}/my-leads/export?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
- 
+
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.error || `Export failed: ${response.status}`);
       }
- 
+
       // Get filename from Content-Disposition header
       const disposition = response.headers.get('Content-Disposition') || '';
       const filenameMatch = disposition.match(/filename=(.+)/);
       const filename = filenameMatch ? filenameMatch[1] : `intentiq-export.${format === 'json' ? 'json' : 'csv'}`;
- 
+
       const blob = await response.blob();
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
- 
+
       setDone(true);
       setTimeout(() => setDone(false), 3000);
     } catch (err: any) {
@@ -542,9 +542,9 @@ const CRMExportModal = ({
       setExporting(false);
     }
   };
- 
+
   const exportCount = countLoading ? '…' : (totalCount ?? leads.length);
- 
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
@@ -552,7 +552,7 @@ const CRMExportModal = ({
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
         className="w-full max-w-lg bg-[#0d0e14] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
         onClick={e => e.stopPropagation()}>
- 
+
         {/* Header */}
         <div className="p-6 border-b border-white/5 flex items-center gap-4">
           <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center">
@@ -568,37 +568,35 @@ const CRMExportModal = ({
           </div>
           <button onClick={onClose} className="ml-auto text-slate-600 hover:text-white transition-colors text-xl">×</button>
         </div>
- 
+
         <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
- 
+
           {/* Status filter */}
           <div>
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Filter by Status</p>
             <div className="flex flex-wrap gap-2">
               {STATUSES.map(s => (
                 <button key={s.id} onClick={() => setStatus(s.id as any)}
-                  className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-                    status === s.id
-                      ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-400'
-                      : 'bg-white/[0.02] border-white/5 text-slate-500 hover:border-white/20'
-                  }`}>
+                  className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${status === s.id
+                    ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-400'
+                    : 'bg-white/[0.02] border-white/5 text-slate-500 hover:border-white/20'
+                    }`}>
                   {s.label}
                 </button>
               ))}
             </div>
           </div>
- 
+
           {/* Format picker */}
           <div>
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Export Format</p>
             <div className="space-y-2">
               {FORMATS.map(f => (
                 <button key={f.id} onClick={() => setFormat(f.id as any)}
-                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl border transition-all text-left ${
-                    format === f.id
-                      ? f.color + ' border-opacity-100'
-                      : 'bg-white/[0.02] border-white/5 hover:border-white/20'
-                  }`}>
+                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl border transition-all text-left ${format === f.id
+                    ? f.color + ' border-opacity-100'
+                    : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                    }`}>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${format === f.id ? 'border-current' : 'border-slate-600'}`}>
                     {format === f.id && <div className="w-2 h-2 rounded-full bg-current" />}
                   </div>
@@ -610,13 +608,13 @@ const CRMExportModal = ({
               ))}
             </div>
           </div>
- 
+
           {/* Fields preview */}
           <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl space-y-1.5">
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Fields in this export</p>
             <p className="text-[10px] text-slate-400 leading-relaxed">{FIELD_LABELS[format]}</p>
           </div>
- 
+
           {/* How to import guide */}
           {(format === 'hubspot' || format === 'salesforce') && (
             <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-xl">
@@ -643,7 +641,7 @@ const CRMExportModal = ({
             </div>
           )}
         </div>
- 
+
         {/* Footer CTA */}
         <div className="p-6 pt-0 border-t border-white/5">
           {/* Lead count */}
@@ -655,14 +653,14 @@ const CRMExportModal = ({
                 : <>{exportCount} lead{Number(exportCount) !== 1 ? 's' : ''}</>}
             </span>
           </div>
- 
+
           <button onClick={doExport} disabled={exporting || done}
             className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shadow-lg shadow-indigo-600/20">
             {exporting
               ? <><ArrowPathIcon className="w-4 h-4 animate-spin" /> Preparing {format.toUpperCase()}…</>
               : done
-              ? <><CheckCircleIcon className="w-4 h-4" /> Downloaded — check your downloads!</>
-              : <><CloudArrowDownIcon className="w-4 h-4" /> Download {format.toUpperCase()} ({exportCount} leads)</>}
+                ? <><CheckCircleIcon className="w-4 h-4" /> Downloaded — check your downloads!</>
+                : <><CloudArrowDownIcon className="w-4 h-4" /> Download {format.toUpperCase()} ({exportCount} leads)</>}
           </button>
           <button onClick={onClose}
             className="mt-3 w-full text-slate-600 text-[9px] font-bold uppercase tracking-widest hover:text-white transition-colors">
@@ -680,33 +678,33 @@ const LeadDetailsView = ({
   lead, onAudit, onVerify, isAuditing, isVerifying,
   verificationResult, isVerifyingAll, onStatusUpdate, auditResult,
 }: {
-  lead:               Lead;
-  onAudit:            (l: Lead) => void;
-  onVerify:           (l: Lead) => void;
-  isAuditing:         boolean;
-  isVerifying:        boolean;
+  lead: Lead;
+  onAudit: (l: Lead) => void;
+  onVerify: (l: Lead) => void;
+  isAuditing: boolean;
+  isVerifying: boolean;
   verificationResult?: VerificationResult;
-  isVerifyingAll?:    boolean;
-  onStatusUpdate?:    (leadId: string, status: string) => void;
-  auditResult?:       any;
+  isVerifyingAll?: boolean;
+  onStatusUpdate?: (leadId: string, status: string) => void;
+  auditResult?: any;
 }) => {
   const [showRejection, setShowRejection] = useState(false);
-  const [localStatus, setLocalStatus]     = useState(lead.status || 'new');
+  const [localStatus, setLocalStatus] = useState(lead.status || 'new');
   useEffect(() => { setLocalStatus(lead.status || 'new'); }, [lead.id, lead.status]);
 
-  const emailVerif   = (verificationResult as any)?.email;
+  const emailVerif = (verificationResult as any)?.email;
   const websiteVerif = (verificationResult as any)?.website;
 
   const scoreColor =
     lead.score >= 80 ? '#10b981' :
-    lead.score >= 60 ? '#6366f1' :
-    lead.score >= 40 ? '#f59e0b' : '#ef4444';
+      lead.score >= 60 ? '#6366f1' :
+        lead.score >= 40 ? '#f59e0b' : '#ef4444';
 
   // Determine audit button label based on lead state
   const auditLabel =
     !lead.email && !(lead as any).phone_number ? '🔍 Find Contact' :
-    (verificationResult as any)?.overall === 'failed'     ? '🔍 Verify & Enrich' :
-    '🔍 Deep Audit';
+      (verificationResult as any)?.overall === 'failed' ? '🔍 Verify & Enrich' :
+        '🔍 Deep Audit';
 
   return (
     <>
@@ -883,12 +881,12 @@ const LeadDetailsView = ({
             ) : emailVerif?.checks ? (
               <div className="space-y-3">
                 {[
-                  { key: 'format',         label: 'Format',        val: emailVerif.checks.format },
-                  { key: 'disposable',     label: 'Not Disposable',val: !emailVerif.checks.disposable },
-                  { key: 'mx',             label: 'MX Record',     val: emailVerif.checks.mx },
-                  { key: 'smtp_reachable', label: 'SMTP Reach',    val: emailVerif.checks.smtp_reachable },
-                  { key: 'is_catchall',    label: 'Not Catchall',  val: !emailVerif.checks.is_catchall },
-                  { key: 'mailbox_exists', label: 'Mailbox',       val: emailVerif.checks.mailbox_exists },
+                  { key: 'format', label: 'Format', val: emailVerif.checks.format },
+                  { key: 'disposable', label: 'Not Disposable', val: !emailVerif.checks.disposable },
+                  { key: 'mx', label: 'MX Record', val: emailVerif.checks.mx },
+                  { key: 'smtp_reachable', label: 'SMTP Reach', val: emailVerif.checks.smtp_reachable },
+                  { key: 'is_catchall', label: 'Not Catchall', val: !emailVerif.checks.is_catchall },
+                  { key: 'mailbox_exists', label: 'Mailbox', val: emailVerif.checks.mailbox_exists },
                 ].map(({ key, label, val }) => (
                   <div key={key} className="flex items-center justify-between">
                     <span className="text-[11px] text-slate-500">{label}</span>
@@ -904,13 +902,13 @@ const LeadDetailsView = ({
                   <CircularProgress
                     value={
                       emailVerif.deliverability === 'deliverable' ? 100 :
-                      emailVerif.deliverability === 'probable'    ? 65  :
-                      emailVerif.deliverability === 'unknown'     ? 40  : 10
+                        emailVerif.deliverability === 'probable' ? 65 :
+                          emailVerif.deliverability === 'unknown' ? 40 : 10
                     }
                     size={52} strokeWidth={4}
                     color={
                       emailVerif.deliverability === 'deliverable' ? '#10b981' :
-                      emailVerif.deliverability === 'probable'    ? '#f59e0b' : '#ef4444'
+                        emailVerif.deliverability === 'probable' ? '#f59e0b' : '#ef4444'
                     }
                   />
                   <div>
@@ -966,31 +964,31 @@ const App: React.FC = () => {
   const location = useLocation();
 
   // App state
-  const [campaigns, setCampaigns]     = useState<Campaign[]>([]);
-  const [users, setUsers]             = useState<User[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [globalLeads, setGlobalLeads] = useState<Lead[]>([]);
 
   // Search state
-  const [niche, setNiche]                       = useState('');
-  const [city, setCity]                         = useState('');
-  const [serviceOffered, setServiceOffered]     = useState('');
+  const [niche, setNiche] = useState('');
+  const [city, setCity] = useState('');
+  const [serviceOffered, setServiceOffered] = useState('');
   const [idealCompanyType, setIdealCompanyType] = useState('');
-  const [targetGoal, setTargetGoal]             = useState(10);
-  const [nicheIntel, setNicheIntel]             = useState<NicheIntel | null>(null);
-  const [leads, setLeads]                       = useState<Lead[]>([]);
-  const [selectedLead, setSelectedLead]         = useState<Lead | null>(null);
+  const [targetGoal, setTargetGoal] = useState(10);
+  const [nicheIntel, setNicheIntel] = useState<NicheIntel | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
   // Admin state
-  const [adminNiche, setAdminNiche]                 = useState('');
-  const [adminCity, setAdminCity]                   = useState('');
-  const [view, setView]                             = useState('');
+  const [adminNiche, setAdminNiche] = useState('');
+  const [adminCity, setAdminCity] = useState('');
+  const [view, setView] = useState('');
   const [isAdminCrawlLoading, setIsAdminCrawlLoading] = useState(false);
 
   // UI state
-  const [toasts, setToasts]               = useState<{ id: string; message: string }[]>([]);
-  const [limitInfo, setLimitInfo]         = useState<LimitInfo | null>(null);
+  const [toasts, setToasts] = useState<{ id: string; message: string }[]>([]);
+  const [limitInfo, setLimitInfo] = useState<LimitInfo | null>(null);
   const [showUpgradeWall, setShowUpgradeWall] = useState(false);
-  const [isVerifyingAll, setIsVerifyingAll]   = useState(false);
+  const [isVerifyingAll, setIsVerifyingAll] = useState(false);
   const [verificationResults, setVerificationResults] = useState<Record<string, VerificationResult>>({});
 
   // Market exhaustion
@@ -998,14 +996,14 @@ const App: React.FC = () => {
   const [suggestedCities, setSuggestedCities] = useState<string[]>([]);
 
   // Loading / error
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState<string | null>(null);
-  const [isAuditing, setIsAuditing]   = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
   // Per-lead deep audit results (keyed by lead id)
   const [auditResults, setAuditResults] = useState<Record<string, any>>({});
-    const [showExport, setShowExport]       = useState(false);
+  const [showExport, setShowExport] = useState(false);
 
 
   // Toasts
@@ -1031,23 +1029,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (view === 'setup')   addToast("Tip: Be as specific as possible with your 'Ideal Company Type'.");
+    if (view === 'setup') addToast("Tip: Be as specific as possible with your 'Ideal Company Type'.");
     if (view === 'results') addToast("Tip: Click a lead then run 'Deep Audit' to uncover outreach angles.");
   }, [view]);
 
   // Initialisation — load from localStorage
   useEffect(() => {
-    const storedCampaigns   = localStorage.getItem('lg_campaigns');
-    const storedUsers       = localStorage.getItem('lg_all_users');
+    const storedCampaigns = localStorage.getItem('lg_campaigns');
+    const storedUsers = localStorage.getItem('lg_all_users');
     const storedGlobalLeads = localStorage.getItem('lg_global_leads');
-    if (storedCampaigns)   setCampaigns(JSON.parse(storedCampaigns));
+    if (storedCampaigns) setCampaigns(JSON.parse(storedCampaigns));
     if (storedGlobalLeads) setGlobalLeads(JSON.parse(storedGlobalLeads));
     if (storedUsers) {
       setUsers(JSON.parse(storedUsers));
     } else {
       const initialUsers: User[] = [
         { id: 'u1', email: 'admin@intentiq.io', role: 'admin', plan: 'enterprise', credits: 9999, joinedAt: new Date().toISOString() },
-        { id: 'u2', email: 'demo@user.com',     role: 'user',  plan: 'pro',        credits: 250,  joinedAt: new Date().toISOString() },
+        { id: 'u2', email: 'demo@user.com', role: 'user', plan: 'pro', credits: 250, joinedAt: new Date().toISOString() },
       ];
       setUsers(initialUsers);
       localStorage.setItem('lg_all_users', JSON.stringify(initialUsers));
@@ -1131,13 +1129,13 @@ const App: React.FC = () => {
 
       const normalized = (foundLeads || []).map((l: any) => ({
         ...l,
-        phone:          l.phone_number || l.phone,
-        city:           l.city  || city,
-        niche:          l.niche || niche,
+        phone: l.phone_number || l.phone,
+        city: l.city || city,
+        niche: l.niche || niche,
         scoreBreakdown: l.scoreBreakdown ?? {},
-        socials:        {},
-        source:         l.source || 'ai_search',
-        confidence:     l.score,
+        socials: {},
+        source: l.source || 'ai_search',
+        confidence: l.score,
       }));
 
       if (!normalized.length) {
@@ -1171,7 +1169,7 @@ const App: React.FC = () => {
         try {
           const exRes = await api.post('/market-exhaustion', { niche, city });
           if (exRes.data?.suggested_cities?.length) setSuggestedCities(exRes.data.suggested_cities);
-        } catch (_) {}
+        } catch (_) { }
       }
 
     } catch (e: any) {
@@ -1213,43 +1211,101 @@ const App: React.FC = () => {
   };
 
   // performAudit — calls real /deep-audit/<lead_id> backend endpoint
-  const performAudit = async (lead: Lead) => {
-    if (isAuditing) return;
-    setIsAuditing(true);
-    try {
-      const res    = await api.post(`/deep-audit/${lead.id}`);
-      const result = res.data;
+ const performAudit = async (lead: Lead) => {
+  if (isAuditing) return;
+  setIsAuditing(true);
 
-      // Update the lead in state if backend found better data
-      if (result.updated) {
-        const updatedLeads = leads.map(l => l.id === lead.id
-          ? {
-              ...l,
-              email:        result.email        ?? l.email,
-              website:      result.website      ?? l.website,
-              phone_number: result.phone_number ?? (l as any).phone_number,
-            }
-          : l
-        );
-        setLeads(updatedLeads);
-        const current = updatedLeads.find(l => l.id === lead.id);
-        if (current) setSelectedLead(current);
+  // Clear previous audit result so panel shows loading state
+  setAuditResults(prev => {
+    const next = { ...prev };
+    delete next[lead.id];
+    return next;
+  });
+
+  try {
+    const res    = await api.post(`/deep-audit/${lead.id}`);
+    const result = res.data;
+
+    // Update lead fields
+    const updatedLeads = leads.map(l => l.id === lead.id
+      ? {
+          ...l,
+          email:        result.email        ?? l.email,
+          website:      result.website      ?? l.website,
+          phone_number: result.phone_number ?? (l as any).phone_number,
+          status: result.email_verified_by_audit
+            ? 'verified'
+            : (result.updated && result.website ? 'partial' : l.status),
+        }
+      : l
+    );
+    setLeads(updatedLeads);
+    const current = updatedLeads.find(l => l.id === lead.id);
+    if (current) setSelectedLead(current);
+
+    // Store audit result
+    setAuditResults(prev => ({ ...prev, [lead.id]: result }));
+
+    // ── If audit found a new email, automatically run real verification ───
+    // This runs MX + SMTP on the newly discovered email so badges are accurate
+    if (result.email_verified_by_audit || result.updated) {
+      debugger
+      try {
+        const verifyRes = await api.post(`/verify-lead/${lead.id}`);
+        setVerificationResults(prev => ({
+          ...prev,
+          [lead.id]: verifyRes.data,
+        }));
+
+        // Also update status from verification result
+        const verifyOverall = verifyRes.data?.overall;
+        if (verifyOverall === 'verified' || verifyOverall === 'partial') {
+          setLeads(prev => prev.map(l => l.id === lead.id
+            ? { ...l, status: verifyOverall === 'verified' ? 'verified' : l.status }
+            : l
+          ));
+        }
+      } catch (verifyErr: any) {
+        // Verification failed (pro gate or network) — not fatal
+        // Just set a basic result so badge shows something reasonable
+        if (result.email) {
+          setVerificationResults(prev => ({
+            ...prev,
+            [lead.id]: {
+              ...prev[lead.id],
+              lead_id: lead.id,
+              overall: 'partial',
+              email: {
+                is_valid:       true,
+                deliverability: 'probable',
+                status:         'audit_verified',
+                checks: {
+                  format:         true,
+                  disposable:     false,
+                  mx:             null,
+                  smtp_reachable: null,
+                  is_catchall:    null,
+                  mailbox_exists: null,
+                  port_blocked:   null,
+                },
+              },
+            } as any,
+          }));
+        }
       }
-
-      // Store audit result for this lead
-      setAuditResults(prev => ({ ...prev, [lead.id]: result }));
-
-    } catch (e: any) {
-      const errData = e.response?.data;
-      if (errData?.error === 'pro_required') {
-        setError('Deep Audit is available on the Pro plan.');
-      } else {
-        setError('Deep audit failed. Please try again.');
-      }
-    } finally {
-      setIsAuditing(false);
     }
-  };
+
+  } catch (e: any) {
+    const errData = e.response?.data;
+    if (errData?.error === 'pro_required') {
+      setError('Deep Audit is available on the Pro plan.');
+    } else {
+      setError('Deep audit failed. Please try again.');
+    }
+  } finally {
+    setIsAuditing(false);
+  }
+};
 
   // Admin crawl — kept but no longer uses geminiService
   const runAdminGlobalCrawl = async () => {
@@ -1259,7 +1315,7 @@ const App: React.FC = () => {
       // Seed vault via backend search with admin account
       const res = await api.post('/search-leads', {
         niche: adminNiche,
-        city:  adminCity,
+        city: adminCity,
         count: 20,
         idealCompanyType: 'Any',
       });
@@ -1276,7 +1332,7 @@ const App: React.FC = () => {
 
   const handlePlanUpgrade = (planId: PlanType) => {
     if (!currentUser) return;
-    const plan        = PLANS.find(p => p.id === planId)!;
+    const plan = PLANS.find(p => p.id === planId)!;
     const updatedUser = { ...currentUser, plan: planId, credits: currentUser.credits + plan.credits };
     updateUser(updatedUser);
     saveAppState(updatedUser, campaigns, users, globalLeads);
@@ -1325,7 +1381,7 @@ const App: React.FC = () => {
             </AnimatePresence>
           </div>
 
-           {/* CRM Export Modal */}
+          {/* CRM Export Modal */}
           <AnimatePresence>
             {showExport && <CRMExportModal leads={leads} onClose={() => setShowExport(false)} />}
           </AnimatePresence>
@@ -1403,7 +1459,7 @@ const App: React.FC = () => {
 
             <Routes>
               <Route path="/" element={<LandingView setView={setView} onNavigate={navigate} />} />
-              <Route path="/login"    element={<LoginInput onLogin={handleLogin} initialMode="login"    />} />
+              <Route path="/login" element={<LoginInput onLogin={handleLogin} initialMode="login" />} />
               <Route path="/register" element={<LoginInput onLogin={handleLogin} initialMode="register" />} />
 
               <Route path="/dashboard" element={
@@ -1468,14 +1524,14 @@ const App: React.FC = () => {
                               </span>
                             )}
                           </h3>
-                            {/* Export button */}
-                            {/* {leads.length > 0 && (
+                          {/* Export button */}
+                          {/* {leads.length > 0 && (
                               <button onClick={() => setShowExport(true)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all">
                                 <CloudArrowDownIcon className="w-3.5 h-3.5" /> Export
                               </button>
-                            )} */} 
-                            
+                            )} */}
+
                           <button onClick={() => {
                             setLeads([]);
                             setSelectedLead(null);
@@ -1492,24 +1548,23 @@ const App: React.FC = () => {
 
                         <div className="space-y-3 overflow-y-auto max-h-[40vh] lg:max-h-[70vh] pr-2 custom-scrollbar">
                           {leads.map(l => {
-                            const vr      = verificationResults[l.id] as any;
+                            const vr = verificationResults[l.id] as any;
                             const emailOk = vr?.email?.is_valid;
                             const hasAudit = !!auditResults[l.id];
                             return (
                               <div
                                 key={l.id}
                                 onClick={() => { setSelectedLead(l); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                                className={`p-4 md:p-5 rounded-2xl border cursor-pointer transition-all ${
-                                  selectedLead?.id === l.id
-                                    ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/5'
-                                    : 'bg-white/[0.02] border-white/5 hover:border-white/20'
-                                }`}
+                                className={`p-4 md:p-5 rounded-2xl border cursor-pointer transition-all ${selectedLead?.id === l.id
+                                  ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/5'
+                                  : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                                  }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 truncate">
-                                    {l.status === 'verified'  && <CheckBadgeIcon className="w-4 h-4 text-emerald-400 shrink-0" />}
-                                    {l.status === 'qualified' && <CheckCircleIcon  className="w-4 h-4 text-blue-400 shrink-0"   />}
-                                    {l.status === 'rejected'  && <XCircleIcon      className="w-4 h-4 text-red-400 shrink-0"    />}
+                                    {l.status === 'verified' && <CheckBadgeIcon className="w-4 h-4 text-emerald-400 shrink-0" />}
+                                    {l.status === 'qualified' && <CheckCircleIcon className="w-4 h-4 text-blue-400 shrink-0" />}
+                                    {l.status === 'rejected' && <XCircleIcon className="w-4 h-4 text-red-400 shrink-0" />}
                                     <h4 className="text-white font-bold text-sm truncate">{l.name}</h4>
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
@@ -1636,7 +1691,7 @@ const App: React.FC = () => {
 
               <Route path="/pricing" element={<BillingView currentUser={currentUser} onUpgrade={handlePlanUpgrade} />} />
               <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate(-1)} />} />
-              <Route path="/terms"   element={<TermsOfService onBack={() => navigate(-1)} />} />
+              <Route path="/terms" element={<TermsOfService onBack={() => navigate(-1)} />} />
             </Routes>
           </main>
 
@@ -1651,7 +1706,7 @@ const App: React.FC = () => {
               </div>
               <div className="flex gap-6">
                 <button onClick={() => navigate('/privacy')} className="hover:text-white transition-colors">Privacy</button>
-                <button onClick={() => navigate('/terms')}   className="hover:text-white transition-colors">Terms</button>
+                <button onClick={() => navigate('/terms')} className="hover:text-white transition-colors">Terms</button>
                 <a href="#" className="hover:text-white transition-colors">Help</a>
               </div>
             </footer>
