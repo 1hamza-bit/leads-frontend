@@ -1004,7 +1004,8 @@ const App: React.FC = () => {
   // Per-lead deep audit results (keyed by lead id)
   const [auditResults, setAuditResults] = useState<Record<string, any>>({});
   const [showExport, setShowExport] = useState(false);
-
+  const [isBulkAuditing, setIsBulkAuditing] = useState(false);
+  const [bulkAuditProgress, setBulkAuditProgress] = useState({ done: 0, total: 0 });
 
   // Toasts
   const addToast = (message: string) => {
@@ -1150,6 +1151,22 @@ const App: React.FC = () => {
 
       if (market_exhausted) setMarketExhausted(true);
       setLeads(normalized);
+      // Seed verification results from persisted data
+      // This means tags show immediately on load, no re-verify needed
+      const persistedVerifications: Record<string, VerificationResult> = {};
+      normalized.forEach((l: any) => {
+        if (l.verification?.overall) {
+          persistedVerifications[l.id] = {
+            lead_id: l.id,
+            overall: l.verification.overall,
+            email: l.verification.email ?? {},
+            website: l.verification.website ?? {},
+          } as any;
+        }
+      });
+      if (Object.keys(persistedVerifications).length > 0) {
+        setVerificationResults(persistedVerifications);
+      }
       setSelectedLead(normalized[0]);
       navigate('/results');
 
@@ -1211,101 +1228,173 @@ const App: React.FC = () => {
   };
 
   // performAudit — calls real /deep-audit/<lead_id> backend endpoint
- const performAudit = async (lead: Lead) => {
-  if (isAuditing) return;
-  setIsAuditing(true);
+  const performAudit = async (lead: Lead) => {
+    if (isAuditing) return;
+    setIsAuditing(true);
 
-  // Clear previous audit result so panel shows loading state
-  setAuditResults(prev => {
-    const next = { ...prev };
-    delete next[lead.id];
-    return next;
-  });
+    // Clear previous audit result so panel shows loading state
+    setAuditResults(prev => {
+      const next = { ...prev };
+      delete next[lead.id];
+      return next;
+    });
 
-  try {
-    const res    = await api.post(`/deep-audit/${lead.id}`);
-    const result = res.data;
+    try {
+      const res = await api.post(`/deep-audit/${lead.id}`);
+      const result = res.data;
 
-    // Update lead fields
-    const updatedLeads = leads.map(l => l.id === lead.id
-      ? {
+      // Update lead fields
+      const updatedLeads = leads.map(l => l.id === lead.id
+        ? {
           ...l,
-          email:        result.email        ?? l.email,
-          website:      result.website      ?? l.website,
+          email: result.email ?? l.email,
+          website: result.website ?? l.website,
           phone_number: result.phone_number ?? (l as any).phone_number,
           status: result.email_verified_by_audit
             ? 'verified'
             : (result.updated && result.website ? 'partial' : l.status),
         }
-      : l
-    );
-    setLeads(updatedLeads);
-    const current = updatedLeads.find(l => l.id === lead.id);
-    if (current) setSelectedLead(current);
+        : l
+      );
+      setLeads(updatedLeads);
+      const current = updatedLeads.find(l => l.id === lead.id);
+      if (current) setSelectedLead(current);
 
-    // Store audit result
-    setAuditResults(prev => ({ ...prev, [lead.id]: result }));
+      // Store audit result
+      setAuditResults(prev => ({ ...prev, [lead.id]: result }));
 
-    // ── If audit found a new email, automatically run real verification ───
-    // This runs MX + SMTP on the newly discovered email so badges are accurate
-    if (result.email_verified_by_audit || result.updated) {
-      debugger
-      try {
-        const verifyRes = await api.post(`/verify-lead/${lead.id}`);
-        setVerificationResults(prev => ({
-          ...prev,
-          [lead.id]: verifyRes.data,
-        }));
-
-        // Also update status from verification result
-        const verifyOverall = verifyRes.data?.overall;
-        if (verifyOverall === 'verified' || verifyOverall === 'partial') {
-          setLeads(prev => prev.map(l => l.id === lead.id
-            ? { ...l, status: verifyOverall === 'verified' ? 'verified' : l.status }
-            : l
-          ));
-        }
-      } catch (verifyErr: any) {
-        // Verification failed (pro gate or network) — not fatal
-        // Just set a basic result so badge shows something reasonable
-        if (result.email) {
+      // ── If audit found a new email, automatically run real verification ───
+      // This runs MX + SMTP on the newly discovered email so badges are accurate
+      if (result.email_verified_by_audit || result.updated) {
+        debugger
+        try {
+          const verifyRes = await api.post(`/verify-lead/${lead.id}`);
           setVerificationResults(prev => ({
             ...prev,
-            [lead.id]: {
-              ...prev[lead.id],
-              lead_id: lead.id,
-              overall: 'partial',
-              email: {
-                is_valid:       true,
-                deliverability: 'probable',
-                status:         'audit_verified',
-                checks: {
-                  format:         true,
-                  disposable:     false,
-                  mx:             null,
-                  smtp_reachable: null,
-                  is_catchall:    null,
-                  mailbox_exists: null,
-                  port_blocked:   null,
-                },
-              },
-            } as any,
+            [lead.id]: verifyRes.data,
           }));
+
+          // Also update status from verification result
+          const verifyOverall = verifyRes.data?.overall;
+          if (verifyOverall === 'verified' || verifyOverall === 'partial') {
+            setLeads(prev => prev.map(l => l.id === lead.id
+              ? { ...l, status: verifyOverall === 'verified' ? 'verified' : l.status }
+              : l
+            ));
+          }
+        } catch (verifyErr: any) {
+          // Verification failed (pro gate or network) — not fatal
+          // Just set a basic result so badge shows something reasonable
+          if (result.email) {
+            setVerificationResults(prev => ({
+              ...prev,
+              [lead.id]: {
+                ...prev[lead.id],
+                lead_id: lead.id,
+                overall: 'partial',
+                email: {
+                  is_valid: true,
+                  deliverability: 'probable',
+                  status: 'audit_verified',
+                  checks: {
+                    format: true,
+                    disposable: false,
+                    mx: null,
+                    smtp_reachable: null,
+                    is_catchall: null,
+                    mailbox_exists: null,
+                    port_blocked: null,
+                  },
+                },
+              } as any,
+            }));
+          }
         }
       }
+
+    } catch (e: any) {
+      const errData = e.response?.data;
+      if (errData?.error === 'pro_required') {
+        setError('Deep Audit is available on the Pro plan.');
+      } else {
+        setError('Deep audit failed. Please try again.');
+      }
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const bulkAuditMissingLeads = async (targetLeads?: Lead[]) => {
+    const source = targetLeads ?? leads; // falls back to results-page leads
+    if (isBulkAuditing) return;
+
+    // Pick leads that need auditing:
+    // - no email at all, OR
+    // - email verification failed/not run
+    const needsAudit = targetLeads.filter(l => {
+      if (!l.email) return true;
+      const vr = verificationResults[l.id] as any;
+      if (!vr) return true;
+      const emailOk = vr?.email?.is_valid;
+      return emailOk === false || emailOk === null || emailOk === undefined;
+    });
+
+    if (!needsAudit.length) {
+      addToast('All leads already have verified emails.');
+      return;
     }
 
-  } catch (e: any) {
-    const errData = e.response?.data;
-    if (errData?.error === 'pro_required') {
-      setError('Deep Audit is available on the Pro plan.');
-    } else {
-      setError('Deep audit failed. Please try again.');
+    setIsBulkAuditing(true);
+    setBulkAuditProgress({ done: 0, total: needsAudit.length });
+    addToast(`Starting bulk audit on ${needsAudit.length} leads...`);
+
+    for (let i = 0; i < needsAudit.length; i++) {
+      const lead = needsAudit[i];
+      try {
+        const res = await api.post(`/deep-audit/${lead.id}`);
+        const result = res.data;
+
+        // Update lead
+        setLeads(prev => prev.map(l => l.id === lead.id
+          ? {
+            ...l,
+            email: result.email ?? l.email,
+            website: result.website ?? l.website,
+            phone_number: result.phone_number ?? (l as any).phone_number,
+            status: result.email_verified_by_audit ? 'verified' : l.status,
+          }
+          : l
+        ));
+
+        setAuditResults(prev => ({ ...prev, [lead.id]: result }));
+
+        // Auto-verify if email was found
+        if (result.email_verified_by_audit || result.updated) {
+          try {
+            const verifyRes = await api.post(`/verify-lead/${lead.id}`);
+            setVerificationResults(prev => ({ ...prev, [lead.id]: verifyRes.data }));
+          } catch { /* non-fatal */ }
+        }
+
+      } catch (e: any) {
+        const errData = e.response?.data;
+        if (errData?.error === 'pro_required') {
+          setError('Bulk Deep Audit requires Pro plan.');
+          break;
+        }
+        // Single lead failure — log and continue
+        console.error(`Bulk audit failed for lead ${lead.id}:`, e);
+      }
+
+      setBulkAuditProgress({ done: i + 1, total: needsAudit.length });
+      // Small delay between requests to be kind to the API
+      if (i < needsAudit.length - 1) await new Promise(r => setTimeout(r, 800));
     }
-  } finally {
-    setIsAuditing(false);
-  }
-};
+
+    setIsBulkAuditing(false);
+    setBulkAuditProgress({ done: 0, total: 0 });
+    addToast(`Bulk audit complete — ${needsAudit.length} leads processed.`);
+  };
 
   // Admin crawl — kept but no longer uses geminiService
   const runAdminGlobalCrawl = async () => {
@@ -1469,6 +1558,10 @@ const App: React.FC = () => {
                     globalLeads={globalLeads} setNiche={setNiche} setCity={setCity}
                     setServiceOffered={setServiceOffered} setIdealCompanyType={setIdealCompanyType}
                     setLeads={setLeads} setNicheIntel={setNicheIntel}
+                    onBulkAudit={(leads) => bulkAuditMissingLeads(leads ?? myLeads as any)}
+
+                    isBulkAuditing={isBulkAuditing}
+                    bulkAuditProgress={bulkAuditProgress}
                   />
                 </ProtectedRoute>
               } />
@@ -1531,6 +1624,29 @@ const App: React.FC = () => {
                                 <CloudArrowDownIcon className="w-3.5 h-3.5" /> Export
                               </button>
                             )} */}
+
+                          {/* <div className="flex items-center gap-2">
+                            {/* ── Bulk Audit button ── */}
+                            {/* {leads.length > 0 && (
+                              <button
+                                onClick={() => bulkAuditMissingLeads(leads)}
+                                disabled={isBulkAuditing}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[9px] font-black uppercase tracking-widest hover:bg-indigo-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                {isBulkAuditing ? (
+                                  <>
+                                    <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                                    {bulkAuditProgress.done}/{bulkAuditProgress.total}
+                                  </>
+                                ) : (
+                                  <>
+                                    <FingerPrintIcon className="w-3 h-3" />
+                                    Bulk Audit
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </div> */} 
 
                           <button onClick={() => {
                             setLeads([]);

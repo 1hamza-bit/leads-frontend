@@ -8,6 +8,7 @@ import {
   XMarkIcon, ExclamationTriangleIcon, ClockIcon,
   ChevronDownIcon, ArrowsUpDownIcon, LinkIcon,
   BuildingOfficeIcon, MapPinIcon, CloudArrowDownIcon,
+  FingerPrintIcon,
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import {
@@ -40,10 +41,10 @@ const TrialBanner = ({ planInfo, onUpgrade }: { planInfo: PlanInfo; onUpgrade: (
       </div>
     );
   }
-  const days  = planInfo.trial_days_remaining ?? 0;
-  const pct   = Math.round(((14 - days) / 14) * 100);
-  const color = days <= 2 ? 'text-red-400'  : days <= 5 ? 'text-amber-400'  : 'text-indigo-400';
-  const bar   = days <= 2 ? 'bg-red-500'    : days <= 5 ? 'bg-amber-500'    : 'bg-indigo-500';
+  const days = planInfo.trial_days_remaining ?? 0;
+  const pct = Math.round(((14 - days) / 14) * 100);
+  const color = days <= 2 ? 'text-red-400' : days <= 5 ? 'text-amber-400' : 'text-indigo-400';
+  const bar = days <= 2 ? 'bg-red-500' : days <= 5 ? 'bg-amber-500' : 'bg-indigo-500';
   return (
     <div className="flex items-center justify-between gap-4 bg-white/[0.02] border border-white/5 rounded-2xl px-5 py-4 mb-6">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -86,8 +87,8 @@ const FilterSelect = ({
   const selected = options.find(o => o.value === value);
   const accent: Record<string, { ring: string; text: string; bg: string }> = {
     indigo: { ring: 'border-indigo-500/60', text: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    cyan:   { ring: 'border-cyan-500/60',   text: 'text-cyan-400',   bg: 'bg-cyan-500/10'   },
-    amber:  { ring: 'border-amber-500/60',  text: 'text-amber-400',  bg: 'bg-amber-500/10'  },
+    cyan: { ring: 'border-cyan-500/60', text: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+    amber: { ring: 'border-amber-500/60', text: 'text-amber-400', bg: 'bg-amber-500/10' },
   };
   const a = accent[accentColor];
   return (
@@ -130,12 +131,12 @@ const SortToggle = ({ sortBy, order, onChange }: {
 }) => {
   const [open, setOpen] = useState(false);
   const opts = [
-    { label: 'Newest first',  sort: 'created_at', ord: 'desc' },
-    { label: 'Oldest first',  sort: 'created_at', ord: 'asc'  },
-    { label: 'Highest score', sort: 'score',       ord: 'desc' },
-    { label: 'Lowest score',  sort: 'score',       ord: 'asc'  },
-    { label: 'Name A→Z',      sort: 'name',        ord: 'asc'  },
-    { label: 'Name Z→A',      sort: 'name',        ord: 'desc' },
+    { label: 'Newest first', sort: 'created_at', ord: 'desc' },
+    { label: 'Oldest first', sort: 'created_at', ord: 'asc' },
+    { label: 'Highest score', sort: 'score', ord: 'desc' },
+    { label: 'Lowest score', sort: 'score', ord: 'asc' },
+    { label: 'Name A→Z', sort: 'name', ord: 'asc' },
+    { label: 'Name Z→A', sort: 'name', ord: 'desc' },
   ];
   const current = opts.find(o => o.sort === sortBy && o.ord === order) ?? opts[0];
   return (
@@ -204,13 +205,13 @@ const FilterPill = ({ label, value, color, onRemove }: {
 // STATUS + SOURCE BADGES
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_CFG: Record<string, { color: string; bg: string; border: string; dot: string }> = {
-  new:       { color: 'text-indigo-400',  bg: 'bg-indigo-500/10',  border: 'border-indigo-500/20',  dot: 'bg-indigo-400'  },
-  contacted: { color: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/20',   dot: 'bg-amber-400'   },
-  replied:   { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
-  qualified: { color: 'text-cyan-400',    bg: 'bg-cyan-500/10',    border: 'border-cyan-500/20',    dot: 'bg-cyan-400'    },
-  rejected:  { color: 'text-red-400',     bg: 'bg-red-500/10',     border: 'border-red-500/20',     dot: 'bg-red-400'     },
-  verified:  { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
-  saved:     { color: 'text-violet-400',  bg: 'bg-violet-500/10',  border: 'border-violet-500/20',  dot: 'bg-violet-400'  },
+  new: { color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', dot: 'bg-indigo-400' },
+  contacted: { color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', dot: 'bg-amber-400' },
+  replied: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
+  qualified: { color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', dot: 'bg-cyan-400' },
+  rejected: { color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', dot: 'bg-red-400' },
+  verified: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
+  saved: { color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/20', dot: 'bg-violet-400' },
 };
 const StatusBadge = ({ status }: { status: string }) => {
   const s = STATUS_CFG[status] ?? STATUS_CFG.new;
@@ -223,14 +224,14 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 const SRC_CFG: Record<string, { label: string; cls: string }> = {
-  vault:           { label: 'Vault',    cls: 'text-slate-400  border-slate-500/40'  },
-  google_search:   { label: 'Google',   cls: 'text-blue-400   border-blue-500/40'   },
-  facebook_graph:  { label: 'Facebook', cls: 'text-indigo-400 border-indigo-500/40' },
+  vault: { label: 'Vault', cls: 'text-slate-400  border-slate-500/40' },
+  google_search: { label: 'Google', cls: 'text-blue-400   border-blue-500/40' },
+  facebook_graph: { label: 'Facebook', cls: 'text-indigo-400 border-indigo-500/40' },
   facebook_gemini: { label: 'Facebook', cls: 'text-indigo-400 border-indigo-500/40' },
-  linkedin_signal: { label: 'LinkedIn', cls: 'text-cyan-400   border-cyan-500/40'   },
-  news_signal:     { label: 'News',     cls: 'text-amber-400  border-amber-500/40'  },
-  ai_search:       { label: 'AI',       cls: 'text-violet-400 border-violet-500/40' },
-  csv_import:      { label: 'Imported', cls: 'text-emerald-400 border-emerald-500/40' },
+  linkedin_signal: { label: 'LinkedIn', cls: 'text-cyan-400   border-cyan-500/40' },
+  news_signal: { label: 'News', cls: 'text-amber-400  border-amber-500/40' },
+  ai_search: { label: 'AI', cls: 'text-violet-400 border-violet-500/40' },
+  csv_import: { label: 'Imported', cls: 'text-emerald-400 border-emerald-500/40' },
 };
 const SourceBadge = ({ source }: { source?: string }) => {
   const c = SRC_CFG[source || ''] ?? SRC_CFG.ai_search;
@@ -267,15 +268,17 @@ const DashboardExportModal = ({
   nicheOptions: string[];
   cityOptions: string[];
 }) => {
-  const [format,     setFormat]     = useState<'csv' | 'json' | 'hubspot' | 'salesforce'>('csv');
-  const [scope,      setScope]      = useState<'all' | 'filtered'>('all');
-  const [niche,      setNiche]      = useState('');
-  const [city,       setCity]       = useState('');
-  const [status,     setStatus]     = useState('');
-  const [exporting,  setExporting]  = useState(false);
-  const [done,       setDone]       = useState(false);
+  const [format, setFormat] = useState<'csv' | 'json' | 'hubspot' | 'salesforce'>('csv');
+  const [scope, setScope] = useState<'all' | 'filtered'>('all');
+  const [niche, setNiche] = useState('');
+  const [city, setCity] = useState('');
+  const [status, setStatus] = useState('');
+  const [exporting, setExporting] = useState(false);
+  const [done, setDone] = useState(false);
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(false);
+  // ── Add near other state declarations ─────────────────────────────────────
+
 
   // When modal opens, pre-fill from active filters if user chose 'filtered'
   useEffect(() => {
@@ -294,8 +297,8 @@ const DashboardExportModal = ({
   useEffect(() => {
     setCountLoading(true);
     const params = new URLSearchParams({ per_page: '1', page: '1' });
-    if (niche)  params.set('niche',  niche);
-    if (city)   params.set('city',   city);
+    if (niche) params.set('niche', niche);
+    if (city) params.set('city', city);
     if (status) params.set('status', status);
 
     api.get(`/my-leads?${params.toString()}`)
@@ -305,32 +308,32 @@ const DashboardExportModal = ({
   }, [niche, city, status]);
 
   const FORMATS = [
-    { id: 'csv',        label: 'CSV',           sub: 'Universal — Excel / Google Sheets',  color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5'  },
-    { id: 'json',       label: 'JSON',           sub: 'All fields + deep audit data',       color: 'text-blue-400 border-blue-500/30 bg-blue-500/5'           },
-    { id: 'hubspot',    label: 'HubSpot CSV',    sub: 'Direct import — HubSpot contacts',   color: 'text-orange-400 border-orange-500/30 bg-orange-500/5'     },
-    { id: 'salesforce', label: 'Salesforce CSV', sub: 'Direct import — Salesforce leads',   color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5'           },
+    { id: 'csv', label: 'CSV', sub: 'Universal — Excel / Google Sheets', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5' },
+    { id: 'json', label: 'JSON', sub: 'All fields + deep audit data', color: 'text-blue-400 border-blue-500/30 bg-blue-500/5' },
+    { id: 'hubspot', label: 'HubSpot CSV', sub: 'Direct import — HubSpot contacts', color: 'text-orange-400 border-orange-500/30 bg-orange-500/5' },
+    { id: 'salesforce', label: 'Salesforce CSV', sub: 'Direct import — Salesforce leads', color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/5' },
   ] as const;
 
   const FIELDS: Record<string, string> = {
-    csv:        'Name, Email, Phone, Website, City, Niche, Score, Status, Reasoning, Email Verified, Decision Maker',
-    json:       'All fields + verification status, deep audit, decision maker, social profiles, activity signals',
-    hubspot:    'First Name, Last Name, Email, Phone, Website URL, City, Industry, Lead Status, Notes, Score',
+    csv: 'Name, Email, Phone, Website, City, Niche, Score, Status, Reasoning, Email Verified, Decision Maker',
+    json: 'All fields + verification status, deep audit, decision maker, social profiles, activity signals',
+    hubspot: 'First Name, Last Name, Email, Phone, Website URL, City, Industry, Lead Status, Notes, Score',
     salesforce: 'Last Name, First Name, Email, Phone, Website, City, Industry, Lead Status, Description, Rating',
   };
 
   const HOW_TO: Record<string, { steps: string[]; link: string }> = {
     hubspot: {
       steps: ['Go to Contacts → Import', 'Choose "Import file from computer"', 'Select "Contacts" as object type', 'Upload CSV — columns map automatically', 'Review duplicates & confirm'],
-      link:  'https://knowledge.hubspot.com/crm-setup/how-to-import-contacts',
+      link: 'https://knowledge.hubspot.com/crm-setup/how-to-import-contacts',
     },
     salesforce: {
       steps: ['Go to Leads → Import', 'Select "Insert new records"', 'Upload CSV', 'Map columns (Last Name required)', 'Click Import Now'],
-      link:  'https://help.salesforce.com/s/articleView?id=sf.importing_crm_data.htm',
+      link: 'https://help.salesforce.com/s/articleView?id=sf.importing_crm_data.htm',
     },
   };
 
-  const nicheOpts  = [{ label: 'All Niches',    value: '' }, ...nicheOptions.map(n => ({ label: n, value: n }))];
-  const cityOpts   = [{ label: 'All Cities',    value: '' }, ...cityOptions.map(c  => ({ label: c, value: c }))];
+  const nicheOpts = [{ label: 'All Niches', value: '' }, ...nicheOptions.map(n => ({ label: n, value: n }))];
+  const cityOpts = [{ label: 'All Cities', value: '' }, ...cityOptions.map(c => ({ label: c, value: c }))];
   const statusOpts = [
     { label: 'All Statuses', value: '' },
     ...Object.keys(STATUS_CFG).map(k => ({ label: k.charAt(0).toUpperCase() + k.slice(1), value: k })),
@@ -340,8 +343,8 @@ const DashboardExportModal = ({
     setExporting(true);
     try {
       const params = new URLSearchParams({ format });
-      if (niche)  params.set('niche',  niche);
-      if (city)   params.set('city',   city);
+      if (niche) params.set('niche', niche);
+      if (city) params.set('city', city);
       if (status) params.set('status', status);
 
       // Get JWT token — try both storage locations
@@ -365,9 +368,9 @@ const DashboardExportModal = ({
       const filename = match ? match[1] : `intentiq-export.${format === 'json' ? 'json' : 'csv'}`;
 
       const blob = await response.blob();
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
@@ -412,15 +415,14 @@ const DashboardExportModal = ({
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">What to export</p>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { id: 'all',      label: 'All my leads',       sub: 'Every lead in your account'         },
+                { id: 'all', label: 'All my leads', sub: 'Every lead in your account' },
                 { id: 'filtered', label: 'Filtered selection', sub: 'Choose niche, city or status below' },
               ].map(s => (
                 <button key={s.id} type="button" onClick={() => setScope(s.id as 'all' | 'filtered')}
-                  className={`p-4 rounded-2xl border text-left transition-all ${
-                    scope === s.id
-                      ? 'bg-indigo-500/10 border-indigo-500/40'
-                      : 'bg-white/[0.02] border-white/5 hover:border-white/20'
-                  }`}>
+                  className={`p-4 rounded-2xl border text-left transition-all ${scope === s.id
+                    ? 'bg-indigo-500/10 border-indigo-500/40'
+                    : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                    }`}>
                   <div className={`w-3.5 h-3.5 rounded-full border-2 mb-2 flex items-center justify-center ${scope === s.id ? 'border-indigo-400' : 'border-slate-600'}`}>
                     {scope === s.id && <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />}
                   </div>
@@ -430,6 +432,7 @@ const DashboardExportModal = ({
               ))}
             </div>
           </div>
+
 
           {/* ── Filters (only visible when scope=filtered) ── */}
           {scope === 'filtered' && (
@@ -459,9 +462,9 @@ const DashboardExportModal = ({
               {/* Active filter pills */}
               {(niche || city || status) && (
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  {niche  && <FilterPill label="Niche"  value={niche}  color="text-indigo-400 bg-indigo-500/10 border border-indigo-500/20" onRemove={() => setNiche('')}  />}
-                  {city   && <FilterPill label="City"   value={city}   color="text-cyan-400   bg-cyan-500/10   border border-cyan-500/20"   onRemove={() => setCity('')}   />}
-                  {status && <FilterPill label="Status" value={status} color="text-amber-400  bg-amber-500/10  border border-amber-500/20"  onRemove={() => setStatus('')} />}
+                  {niche && <FilterPill label="Niche" value={niche} color="text-indigo-400 bg-indigo-500/10 border border-indigo-500/20" onRemove={() => setNiche('')} />}
+                  {city && <FilterPill label="City" value={city} color="text-cyan-400   bg-cyan-500/10   border border-cyan-500/20" onRemove={() => setCity('')} />}
+                  {status && <FilterPill label="Status" value={status} color="text-amber-400  bg-amber-500/10  border border-amber-500/20" onRemove={() => setStatus('')} />}
                   <button type="button" onClick={() => { setNiche(''); setCity(''); setStatus(''); }}
                     className="text-[9px] font-black text-slate-600 hover:text-red-400 transition-colors uppercase tracking-widest flex items-center gap-1">
                     <XMarkIcon className="w-3 h-3" /> Clear
@@ -474,8 +477,8 @@ const DashboardExportModal = ({
                 {countLoading
                   ? <ArrowPathIcon className="w-3.5 h-3.5 text-slate-600 animate-spin" />
                   : <span className="text-[9px] font-black text-slate-500">
-                      Matching leads: <span className="text-indigo-400">{previewCount ?? '—'}</span>
-                    </span>
+                    Matching leads: <span className="text-indigo-400">{previewCount ?? '—'}</span>
+                  </span>
                 }
               </div>
             </div>
@@ -487,9 +490,8 @@ const DashboardExportModal = ({
             <div className="space-y-2">
               {FORMATS.map(f => (
                 <button key={f.id} type="button" onClick={() => setFormat(f.id as any)}
-                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl border transition-all text-left ${
-                    format === f.id ? f.color + ' border-opacity-100' : 'bg-white/[0.02] border-white/5 hover:border-white/20'
-                  }`}>
+                  className={`w-full flex items-center gap-4 p-3.5 rounded-2xl border transition-all text-left ${format === f.id ? f.color + ' border-opacity-100' : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                    }`}>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${format === f.id ? 'border-current' : 'border-slate-600'}`}>
                     {format === f.id && <div className="w-2 h-2 rounded-full bg-current" />}
                   </div>
@@ -540,8 +542,8 @@ const DashboardExportModal = ({
             {exporting
               ? <><ArrowPathIcon className="w-4 h-4 animate-spin" /> Preparing {format.toUpperCase()}…</>
               : done
-              ? <><CheckCircleIcon className="w-4 h-4" /> Downloaded — check your folder!</>
-              : <><CloudArrowDownIcon className="w-4 h-4" /> Download {format.toUpperCase()} ({exportCount} leads)</>}
+                ? <><CheckCircleIcon className="w-4 h-4" /> Downloaded — check your folder!</>
+                : <><CloudArrowDownIcon className="w-4 h-4" /> Download {format.toUpperCase()} ({exportCount} leads)</>}
           </button>
           <button onClick={onClose}
             className="mt-3 w-full text-slate-600 text-[9px] font-bold uppercase tracking-widest hover:text-white transition-colors">
@@ -559,18 +561,18 @@ const DashboardExportModal = ({
 const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void }) => {
   const scoreColor =
     lead.score >= 80 ? 'text-emerald-400' :
-    lead.score >= 60 ? 'text-indigo-400'  :
-    lead.score >= 40 ? 'text-amber-400'   : 'text-red-400';
+      lead.score >= 60 ? 'text-indigo-400' :
+        lead.score >= 40 ? 'text-amber-400' : 'text-red-400';
   const scoreBorder =
     lead.score >= 80 ? 'border-emerald-500/30 bg-emerald-500/5' :
-    lead.score >= 60 ? 'border-indigo-500/30  bg-indigo-500/5'  :
-    lead.score >= 40 ? 'border-amber-500/30   bg-amber-500/5'   :
-    'border-red-500/30 bg-red-500/5';
+      lead.score >= 60 ? 'border-indigo-500/30  bg-indigo-500/5' :
+        lead.score >= 40 ? 'border-amber-500/30   bg-amber-500/5' :
+          'border-red-500/30 bg-red-500/5';
 
-  const dm           = (lead as any).decision_maker;
-  const reasoning    = (lead as any).reasoning;
+  const dm = (lead as any).decision_maker;
+  const reasoning = (lead as any).reasoning;
   const auditSummary = (lead as any).deep_audit_summary;
-  const source       = (lead as any).source;
+  const source = (lead as any).source;
 
   return (
     <div className="flex flex-col h-full bg-[#0a0b10]">
@@ -596,6 +598,25 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
               <span className={`text-xl font-black leading-none ${scoreColor}`}>{lead.score}</span>
               <span className="text-[8px] text-slate-600 font-bold uppercase mt-0.5">score</span>
             </div>
+            <div className="col-span-1 text-right flex flex-col items-end gap-1">
+              <span className={`text-[10px] font-black ${lead.score >= 70 ? 'text-emerald-400' :
+                lead.score >= 40 ? 'text-indigo-400' : 'text-slate-500'
+                }`}>
+                {lead.score}%
+              </span>
+              {/* Verification dot */}
+              {(lead as any).verification?.overall && (() => {
+                const dots: Record<string, string> = {
+                  verified: 'bg-emerald-400',
+                  partial: 'bg-amber-400',
+                  failed: 'bg-red-400',
+                };
+                return (
+                  <div className={`w-1.5 h-1.5 rounded-full ${dots[(lead as any).verification.overall] ?? 'bg-slate-600'}`}
+                    title={`Verification: ${(lead as any).verification.overall}`} />
+                );
+              })()}
+            </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mt-2">
             {lead.niche && (
@@ -611,37 +632,98 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
           </div>
         </div>
 
+        {/* Contact info */}
         <div className="px-5 py-4 border-b border-white/[0.06] space-y-3">
           <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.15em]">Contact</p>
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-              <LinkIcon className="w-3.5 h-3.5 text-slate-600" />
+
+          {/* Website */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                <LinkIcon className="w-3.5 h-3.5 text-slate-600" />
+              </div>
+              {lead.website ? (
+                <a href={lead.website} target="_blank" rel="noreferrer"
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 truncate transition-colors">
+                  {lead.website.replace(/https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
+                </a>
+              ) : (
+                <span className="text-[11px] text-slate-600 italic">No website</span>
+              )}
             </div>
-            {lead.website ? (
-              <a href={lead.website} target="_blank" rel="noreferrer"
-                className="text-[11px] text-indigo-400 hover:text-indigo-300 truncate transition-colors">
-                {lead.website.replace(/https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
-              </a>
-            ) : (
-              <span className="text-[11px] text-slate-600 italic">No website</span>
+            {/* Website live badge from persisted verification */}
+            {(lead as any).verification?.website?.is_live !== undefined && (
+              (lead as any).verification.website.is_live
+                ? <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">Live</span>
+                : <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black border bg-red-500/10 border-red-500/30 text-red-400">Down</span>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-              <EnvelopeIcon className="w-3.5 h-3.5 text-slate-600" />
+
+          {/* Email */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                <EnvelopeIcon className="w-3.5 h-3.5 text-slate-600" />
+              </div>
+              {lead.email ? (
+                <span className="text-[11px] text-slate-300 truncate">{lead.email}</span>
+              ) : (
+                <span className="text-[11px] text-slate-600 italic">No email</span>
+              )}
             </div>
-            {lead.email
-              ? <span className="text-[11px] text-slate-300 truncate flex-1">{lead.email}</span>
-              : <span className="text-[11px] text-slate-600 italic">No email</span>}
+            {/* Email status badge from persisted verification */}
+            {(lead as any).verification?.email?.status && (() => {
+              const STATUS_BADGE: Record<string, { label: string; color: string; bg: string; border: string }> = {
+                verified: { label: 'Verified', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
+                audit_verified: { label: 'Audited', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30' },
+                mx_verified: { label: 'MX OK', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30' },
+                probable: { label: 'Probable', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
+                catchall_server: { label: 'Catch-All', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
+                undeliverable: { label: 'Bad Email', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
+                no_mx_record: { label: 'No MX', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
+                invalid_format: { label: 'Invalid', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30' },
+                no_email: { label: 'No Email', color: 'text-slate-500', bg: 'bg-white/5', border: 'border-white/10' },
+              };
+              const cfg = STATUS_BADGE[(lead as any).verification.email.status] ?? { label: (lead as any).verification.email.status, color: 'text-slate-400', bg: 'bg-white/5', border: 'border-white/10' };
+              return (
+                <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black border ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                  {cfg.label}
+                </span>
+              );
+            })()}
           </div>
+
+          {/* Phone */}
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
               <PhoneIcon className="w-3.5 h-3.5 text-slate-600" />
             </div>
-            {lead.phone_number
-              ? <span className="text-[11px] text-slate-300">{lead.phone_number}</span>
-              : <span className="text-[11px] text-slate-600 italic">No phone</span>}
+            {lead.phone_number ? (
+              <span className="text-[11px] text-slate-300">{lead.phone_number}</span>
+            ) : (
+              <span className="text-[11px] text-slate-600 italic">No phone</span>
+            )}
           </div>
+
+          {/* Overall verification status pill */}
+          {(lead as any).verification?.overall && (
+            <div className="flex items-center gap-2 pt-2 border-t border-white/[0.05]">
+              <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Verification:</span>
+              {(() => {
+                const ov = (lead as any).verification.overall;
+                const OV: Record<string, string> = {
+                  verified: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+                  partial: 'text-amber-400   bg-amber-500/10   border-amber-500/30',
+                  failed: 'text-red-400     bg-red-500/10     border-red-500/30',
+                };
+                return (
+                  <span className={`px-2 py-0.5 rounded-full border text-[9px] font-black capitalize ${OV[ov] ?? OV.failed}`}>
+                    {ov}
+                  </span>
+                );
+              })()}
+            </div>
+          )}
         </div>
 
         {reasoning && (
@@ -703,7 +785,9 @@ const LeadDetailPanel = ({ lead, onClose }: { lead: MyLead; onClose: () => void 
 const UserDashboard = ({
   onNavigate, currentUser, campaigns, globalLeads,
   setNiche, setCity, setServiceOffered, setIdealCompanyType,
-  setLeads, setNicheIntel,
+  setLeads, setNicheIntel, onBulkAudit,
+  isBulkAuditing,
+  bulkAuditProgress,
 }: {
   onNavigate: (v: string) => void;
   currentUser: User | null;
@@ -715,26 +799,48 @@ const UserDashboard = ({
   setIdealCompanyType: (s: string) => void;
   setLeads: (l: Lead[]) => void;
   setNicheIntel: (i: NicheIntel | null) => void;
+  onBulkAudit: (leads?: any[]) => void;
+ isBulkAuditing: boolean;
+  bulkAuditProgress: { done: number; total: number };
 }) => {
-  const [activeTab, setActiveTab]           = useState<DashTab>('overview');
-  const [myLeads, setMyLeads]               = useState<MyLead[]>([]);
-  const [pagination, setPagination]         = useState<LeadsPagination | null>(null);
+  const [activeTab, setActiveTab] = useState<DashTab>('overview');
+  const [myLeads, setMyLeads] = useState<MyLead[]>([]);
+  const [pagination, setPagination] = useState<LeadsPagination | null>(null);
   const [isLoadingLeads, setIsLoadingLeads] = useState(false);
-  const [leadsError, setLeadsError]         = useState<string | null>(null);
-  const [selectedLead, setSelectedLead]     = useState<MyLead | null>(null);
-  const [filters, setFilters]               = useState<LeadFilters>({ page: 1, per_page: 10, sort_by: 'created_at', order: 'desc' });
-  const [nicheOptions, setNicheOptions]     = useState<string[]>([]);
-  const [cityOptions, setCityOptions]       = useState<string[]>([]);
-  const [stats, setStats]                   = useState<DashboardStats | null>(null);
+  const [leadsError, setLeadsError] = useState<string | null>(null);
+  const [selectedLead, setSelectedLead] = useState<MyLead | null>(null);
+  const [filters, setFilters] = useState<LeadFilters>({ page: 1, per_page: 10, sort_by: 'created_at', order: 'desc' });
+  const [nicheOptions, setNicheOptions] = useState<string[]>([]);
+  const [cityOptions, setCityOptions] = useState<string[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
 
   // ── Export modal state ────────────────────────────────────────────────────
   const [showExport, setShowExport] = useState(false);
 
   const detailScrollRef = useRef<HTMLDivElement>(null);
-  const planInfo        = currentUser?.plan_info ?? null;
-  const isTrialExpired  = planInfo?.trial_expired === true;
-  const panelOpen       = selectedLead !== null;
+  const planInfo = currentUser?.plan_info ?? null;
+  const isTrialExpired = planInfo?.trial_expired === true;
+  const panelOpen = selectedLead !== null;
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === myLeads.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(myLeads.map(l => l.id)));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
 
   useEffect(() => {
     const run = async () => {
@@ -763,7 +869,7 @@ const UserDashboard = ({
   useEffect(() => {
     getMyLeadsMeta()
       .then(m => { setNicheOptions(m.niches); setCityOptions(m.cities); })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -784,7 +890,7 @@ const UserDashboard = ({
   const clearFilters = () =>
     setFilters({ page: 1, per_page: 10, sort_by: 'created_at', order: 'desc' });
 
-  const hasActiveFilters  = !!(filters.niche || filters.city || filters.status);
+  const hasActiveFilters = !!(filters.niche || filters.city || filters.status);
   const activeFilterCount = [filters.niche, filters.city, filters.status].filter(Boolean).length;
 
   const handleNewHunt = () => {
@@ -797,8 +903,8 @@ const UserDashboard = ({
   const handleRowClick = (lead: MyLead) =>
     setSelectedLead(prev => prev?.id === lead.id ? null : lead);
 
-  const nicheOpts  = [{ label: 'All Niches',    value: '' }, ...nicheOptions.map(n => ({ label: n, value: n }))];
-  const cityOpts   = [{ label: 'All Cities',    value: '' }, ...cityOptions.map(c  => ({ label: c, value: c }))];
+  const nicheOpts = [{ label: 'All Niches', value: '' }, ...nicheOptions.map(n => ({ label: n, value: n }))];
+  const cityOpts = [{ label: 'All Cities', value: '' }, ...cityOptions.map(c => ({ label: c, value: c }))];
   const statusOpts = [
     { label: 'All Statuses', value: '' },
     ...Object.keys(STATUS_CFG).map(k => ({ label: k.charAt(0).toUpperCase() + k.slice(1), value: k })),
@@ -812,7 +918,7 @@ const UserDashboard = ({
         <DashboardExportModal
           onClose={() => setShowExport(false)}
           activeNiche={filters.niche || ''}
-          activeCity={filters.city   || ''}
+          activeCity={filters.city || ''}
           activeStatus={filters.status || ''}
           totalCount={pagination?.total_count ?? 0}
           nicheOptions={nicheOptions}
@@ -839,8 +945,8 @@ const UserDashboard = ({
               isTrialExpired
                 ? <p className="text-xl md:text-2xl font-black text-red-400">Expired</p>
                 : <p className={`text-xl md:text-2xl font-black ${(planInfo.trial_days_remaining ?? 0) <= 2 ? 'text-red-400' : (planInfo.trial_days_remaining ?? 0) <= 5 ? 'text-amber-400' : 'text-indigo-400'}`}>
-                    {planInfo.trial_days_remaining ?? 0}d left
-                  </p>
+                  {planInfo.trial_days_remaining ?? 0}d left
+                </p>
             ) : (
               <p className="text-xl md:text-2xl font-black text-indigo-400">{currentUser?.credits ?? 0}</p>
             )}
@@ -864,7 +970,7 @@ const UserDashboard = ({
       <div className="flex border-b border-white/5 mb-8">
         {([
           { key: 'overview', label: 'Overview' },
-          { key: 'leads',    label: `My Leads${pagination ? ` (${pagination.total_count})` : ''}` },
+          { key: 'leads', label: `My Leads${pagination ? ` (${pagination.total_count})` : ''}` },
         ] as { key: DashTab; label: string }[]).map(tab => (
           <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)}
             className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative
@@ -886,10 +992,10 @@ const UserDashboard = ({
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: 'Total Leads', val: stats?.stats.total_leads ?? 0,                  sub: `${stats?.stats.leads_this_month ?? 0} this month`,       color: 'text-indigo-400',  icon: <QueueListIcon   className="w-6 h-6" /> },
-                  { label: 'Contacted',   val: stats?.stats.status_breakdown?.contacted ?? 0,  sub: `${stats?.stats.status_breakdown?.replied ?? 0} replied`,   color: 'text-amber-400',   icon: <EnvelopeIcon    className="w-6 h-6" /> },
-                  { label: 'Qualified',   val: stats?.stats.status_breakdown?.qualified ?? 0,  sub: `${stats?.stats.status_breakdown?.rejected ?? 0} rejected`,  color: 'text-emerald-400', icon: <CheckBadgeIcon  className="w-6 h-6" /> },
-                  { label: 'Vault Size',  val: stats?.stats.vault_total ?? 0,                  sub: 'global leads indexed',                                      color: 'text-cyan-400',    icon: <CircleStackIcon className="w-6 h-6" /> },
+                  { label: 'Total Leads', val: stats?.stats.total_leads ?? 0, sub: `${stats?.stats.leads_this_month ?? 0} this month`, color: 'text-indigo-400', icon: <QueueListIcon className="w-6 h-6" /> },
+                  { label: 'Contacted', val: stats?.stats.status_breakdown?.contacted ?? 0, sub: `${stats?.stats.status_breakdown?.replied ?? 0} replied`, color: 'text-amber-400', icon: <EnvelopeIcon className="w-6 h-6" /> },
+                  { label: 'Qualified', val: stats?.stats.status_breakdown?.qualified ?? 0, sub: `${stats?.stats.status_breakdown?.rejected ?? 0} rejected`, color: 'text-emerald-400', icon: <CheckBadgeIcon className="w-6 h-6" /> },
+                  { label: 'Vault Size', val: stats?.stats.vault_total ?? 0, sub: 'global leads indexed', color: 'text-cyan-400', icon: <CircleStackIcon className="w-6 h-6" /> },
                 ].map((s, i) => (
                   <div key={i} className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl">
                     <div className={`w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center ${s.color} mb-4`}>{s.icon}</div>
@@ -932,11 +1038,11 @@ const UserDashboard = ({
                     <h3 className="text-white font-bold mb-5">Pipeline Breakdown</h3>
                     <div className="space-y-3">
                       {[
-                        { label: 'New',       val: stats?.stats.status_breakdown?.new       ?? 0, color: 'bg-indigo-500' },
-                        { label: 'Contacted', val: stats?.stats.status_breakdown?.contacted ?? 0, color: 'bg-amber-500'  },
-                        { label: 'Replied',   val: stats?.stats.status_breakdown?.replied   ?? 0, color: 'bg-cyan-500'   },
-                        { label: 'Qualified', val: stats?.stats.status_breakdown?.qualified ?? 0, color: 'bg-emerald-500'},
-                        { label: 'Rejected',  val: stats?.stats.status_breakdown?.rejected  ?? 0, color: 'bg-red-500'   },
+                        { label: 'New', val: stats?.stats.status_breakdown?.new ?? 0, color: 'bg-indigo-500' },
+                        { label: 'Contacted', val: stats?.stats.status_breakdown?.contacted ?? 0, color: 'bg-amber-500' },
+                        { label: 'Replied', val: stats?.stats.status_breakdown?.replied ?? 0, color: 'bg-cyan-500' },
+                        { label: 'Qualified', val: stats?.stats.status_breakdown?.qualified ?? 0, color: 'bg-emerald-500' },
+                        { label: 'Rejected', val: stats?.stats.status_breakdown?.rejected ?? 0, color: 'bg-red-500' },
                       ].map(row => {
                         const pct = Math.round((row.val / (stats?.stats.total_leads || 1)) * 100);
                         return (
@@ -1027,14 +1133,14 @@ const UserDashboard = ({
                   <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[8px] font-black flex items-center justify-center">{activeFilterCount}</span>
                 )}
               </div>
-              <FilterSelect value={filters.niche  || ''} onChange={v => updateFilter('niche',  v)} options={nicheOpts}  placeholder="Niche"  accentColor="indigo" icon={<QueueListIcon className="w-3.5 h-3.5" />} />
-              <FilterSelect value={filters.city   || ''} onChange={v => updateFilter('city',   v)} options={cityOpts}   placeholder="City"   accentColor="cyan"   icon={<GlobeAltIcon  className="w-3.5 h-3.5" />} />
-              <FilterSelect value={filters.status || ''} onChange={v => updateFilter('status', v)} options={statusOpts} placeholder="Status" accentColor="amber"  icon={<BoltIcon      className="w-3.5 h-3.5" />} />
+              <FilterSelect value={filters.niche || ''} onChange={v => updateFilter('niche', v)} options={nicheOpts} placeholder="Niche" accentColor="indigo" icon={<QueueListIcon className="w-3.5 h-3.5" />} />
+              <FilterSelect value={filters.city || ''} onChange={v => updateFilter('city', v)} options={cityOpts} placeholder="City" accentColor="cyan" icon={<GlobeAltIcon className="w-3.5 h-3.5" />} />
+              <FilterSelect value={filters.status || ''} onChange={v => updateFilter('status', v)} options={statusOpts} placeholder="Status" accentColor="amber" icon={<BoltIcon className="w-3.5 h-3.5" />} />
               <div className="w-px h-5 bg-white/10 mx-1" />
               <PerPageToggle value={filters.per_page || 10} onChange={v => updateFilter('per_page', v)} />
               <SortToggle
                 sortBy={filters.sort_by || 'created_at'}
-                order={filters.order   || 'desc'}
+                order={filters.order || 'desc'}
                 onChange={(s, o) => setFilters(prev => ({ ...prev, sort_by: s as any, order: o as any, page: 1 }))}
               />
 
@@ -1052,9 +1158,9 @@ const UserDashboard = ({
             {hasActiveFilters && (
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Active:</span>
-                {filters.niche  && <FilterPill label="Niche"  value={filters.niche}  color="text-indigo-400 bg-indigo-500/10 border border-indigo-500/20" onRemove={() => updateFilter('niche',  '')} />}
-                {filters.city   && <FilterPill label="City"   value={filters.city}   color="text-cyan-400   bg-cyan-500/10   border border-cyan-500/20"   onRemove={() => updateFilter('city',   '')} />}
-                {filters.status && <FilterPill label="Status" value={filters.status} color="text-amber-400  bg-amber-500/10  border border-amber-500/20"  onRemove={() => updateFilter('status', '')} />}
+                {filters.niche && <FilterPill label="Niche" value={filters.niche} color="text-indigo-400 bg-indigo-500/10 border border-indigo-500/20" onRemove={() => updateFilter('niche', '')} />}
+                {filters.city && <FilterPill label="City" value={filters.city} color="text-cyan-400   bg-cyan-500/10   border border-cyan-500/20" onRemove={() => updateFilter('city', '')} />}
+                {filters.status && <FilterPill label="Status" value={filters.status} color="text-amber-400  bg-amber-500/10  border border-amber-500/20" onRemove={() => updateFilter('status', '')} />}
                 <button type="button" onClick={clearFilters}
                   className="ml-1 text-[9px] font-black text-slate-600 uppercase tracking-widest hover:text-red-400 transition-colors flex items-center gap-1">
                   <XMarkIcon className="w-3 h-3" /> Clear all
@@ -1063,6 +1169,92 @@ const UserDashboard = ({
             )}
           </div>
 
+          {/* ── Bulk audit bar — shows count of leads needing audit ── */}
+          {myLeads.length > 0 && (() => {
+            const needsAudit = myLeads.filter(l =>
+              !l.email ||
+              !(l as any).verification?.overall ||
+              (l as any).verification?.overall === 'failed'
+            ).length;
+            return needsAudit > 0 ? (
+              <div className="flex items-center justify-between p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <FingerPrintIcon className="w-4 h-4 text-indigo-400" />
+                  <div>
+                    <p className="text-white font-bold text-sm">
+                      {needsAudit} lead{needsAudit === 1 ? '' : 's'} need deep audit
+                    </p>
+                    <p className="text-slate-500 text-[10px]">
+                      No email or email not verified — audit will search the web for contact info
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={onBulkAudit}
+                  disabled={isBulkAuditing}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                >
+                  {isBulkAuditing ? (
+                    <>
+                      <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                      {bulkAuditProgress.done}/{bulkAuditProgress.total} auditing...
+                    </>
+                  ) : (
+                    <>
+                      <FingerPrintIcon className="w-4 h-4" />
+                      Bulk Deep Audit ({needsAudit})
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : null;
+          })()}
+
+          {/* ── Selection action bar — slides in when rows are selected ── */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center justify-between gap-3 px-4 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                  {selectedIds.size} selected
+                </span>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase tracking-widest"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Bulk audit selected */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const selectedLeads = myLeads.filter(l => selectedIds.has(l.id));
+                    onBulkAudit(selectedLeads as any);
+                    clearSelection();
+                  }}
+                  disabled={isBulkAuditing}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {isBulkAuditing ? (
+                    <>
+                      <ArrowPathIcon className="w-3.5 h-3.5 animate-spin" />
+                      {bulkAuditProgress.done}/{bulkAuditProgress.total}
+                    </>
+                  ) : (
+                    <>
+                      <FingerPrintIcon className="w-3.5 h-3.5" />
+                      Deep Audit Selected
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Split panel */}
           <div className="flex rounded-2xl border border-white/[0.06] overflow-hidden min-h-[300px]">
 
@@ -1070,19 +1262,42 @@ const UserDashboard = ({
             <div className="flex flex-col bg-white/[0.02] transition-all duration-300"
               style={{ width: panelOpen ? 'min(55%, 100%)' : '100%' }}>
 
+              {/* Table header */}
               {!isLoadingLeads && myLeads.length > 0 && (
-                <div className={`grid px-4 py-3 border-b border-white/[0.06] bg-black/20 text-[9px] font-black text-slate-600 uppercase tracking-widest
-                  ${panelOpen ? 'grid-cols-[1fr_auto]' : 'grid-cols-12'} gap-3`}>
+                <div className={`grid px-4 py-3 border-b border-white/[0.06] bg-black/20 text-[9px] font-black text-slate-600 uppercase tracking-widest gap-3
+    ${panelOpen ? 'grid-cols-[auto_1fr_auto]' : 'grid-cols-[auto_4fr_2fr_2fr_2fr_1fr_1fr]'}`}>
+                  {/* Select-all checkbox */}
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={toggleSelectAll}
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-all
+          ${selectedIds.size === myLeads.length && myLeads.length > 0
+                          ? 'bg-indigo-600 border-indigo-500'
+                          : 'border-white/20 hover:border-white/40'
+                        }`}
+                    >
+                      {selectedIds.size === myLeads.length && myLeads.length > 0 && (
+                        <CheckCircleIcon className="w-3 h-3 text-white" />
+                      )}
+                      {selectedIds.size > 0 && selectedIds.size < myLeads.length && (
+                        <div className="w-2 h-0.5 bg-indigo-400" />
+                      )}
+                    </button>
+                  </div>
                   {panelOpen ? (
-                    <><span>Company</span><span className="text-right">Status</span></>
+                    <>
+                      <span>Company</span>
+                      <span className="text-right">Status</span>
+                    </>
                   ) : (
                     <>
-                      <span className="col-span-4">Company</span>
-                      <span className="col-span-2 hidden md:block">Niche / City</span>
-                      <span className="col-span-2 hidden lg:block">Contact</span>
-                      <span className="col-span-2">Status</span>
-                      <span className="col-span-1 text-right">Score</span>
-                      <span className="col-span-1 text-right hidden sm:block">Date</span>
+                      <span>Company</span>
+                      <span className="hidden md:block">Niche / City</span>
+                      <span className="hidden lg:block">Contact</span>
+                      <span>Status</span>
+                      <span className="text-right">Score</span>
+                      <span className="text-right hidden sm:block">Date</span>
                     </>
                   )}
                 </div>
@@ -1114,19 +1329,36 @@ const UserDashboard = ({
                         ? 'bg-indigo-500/10 border-l-2 border-l-indigo-500'
                         : 'border-l-2 border-l-transparent hover:bg-white/[0.025]'}`}>
                     {panelOpen ? (
-                      <div className="flex items-center justify-between gap-3 px-4 py-3.5">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <div className={`w-1.5 h-8 rounded-full shrink-0 transition-all ${isSelected ? 'bg-indigo-500' : 'bg-transparent'}`} />
-                          <div className="min-w-0">
-                            <p className="text-white font-bold text-[12px] truncate leading-tight">{lead.name}</p>
-                            <p className="text-[10px] text-slate-500 mt-0.5 truncate">{lead.city}</p>
+
+                      <div className="flex items-center gap-2 px-4 py-3.5">
+                        {/* ── Checkbox ── */}
+                        <button
+                          type="button"
+                          onClick={e => { e.stopPropagation(); toggleSelect(lead.id); }}
+                          className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all
+        ${selectedIds.has(lead.id)
+                              ? 'bg-indigo-600 border-indigo-500'
+                              : 'border-white/20 hover:border-white/40'
+                            }`}
+                        >
+                          {selectedIds.has(lead.id) && <CheckCircleIcon className="w-3 h-3 text-white" />}
+                        </button>
+
+                        <div className="flex items-center justify-between gap-3 flex-1 min-w-0"
+                          onClick={() => handleRowClick(lead)}>
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div className={`w-1.5 h-8 rounded-full shrink-0 transition-all ${isSelected ? 'bg-indigo-500' : 'bg-transparent'}`} />
+                            <div className="min-w-0">
+                              <p className="text-white font-bold text-[12px] truncate leading-tight">{lead.name}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5 truncate">{lead.city}</p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="shrink-0 flex items-center gap-2">
-                          <span className={`text-[10px] font-black ${lead.score >= 70 ? 'text-emerald-400' : lead.score >= 40 ? 'text-indigo-400' : 'text-slate-500'}`}>
-                            {lead.score}%
-                          </span>
-                          <StatusBadge status={lead.status} />
+                          <div className="shrink-0 flex items-center gap-2">
+                            <span className={`text-[10px] font-black ${lead.score >= 70 ? 'text-emerald-400' : lead.score >= 40 ? 'text-indigo-400' : 'text-slate-500'}`}>
+                              {lead.score}%
+                            </span>
+                            <StatusBadge status={lead.status} />
+                          </div>
                         </div>
                       </div>
                     ) : (
@@ -1175,13 +1407,15 @@ const UserDashboard = ({
             </div>
 
             {/* Right: detail panel */}
-            {panelOpen && (
-              <div ref={detailScrollRef}
-                className="hidden lg:flex flex-col border-l border-white/[0.06] sticky top-16 self-start overflow-y-auto"
-                style={{ width: '45%', maxHeight: 'calc(100vh - 80px)' }}>
-                <LeadDetailPanel lead={selectedLead!} onClose={() => setSelectedLead(null)} />
-              </div>
-            )}
+            {
+              panelOpen && (
+                <div ref={detailScrollRef}
+                  className="hidden lg:flex flex-col border-l border-white/[0.06] sticky top-16 self-start overflow-y-auto"
+                  style={{ width: '45%', maxHeight: 'calc(100vh - 80px)' }}>
+                  <LeadDetailPanel lead={selectedLead!} onClose={() => setSelectedLead(null)} />
+                </div>
+              )
+            }
           </div>
 
           {/* Mobile bottom sheet */}
