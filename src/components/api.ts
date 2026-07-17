@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // baseURL: 'http://localhost:5000/api', // Matches your Flask blueprint prefix
-  baseURL: 'https://api.shahzadtradingcompany.com/api', // Matches your Flask blueprint prefix
+  baseURL: 'http://localhost:9100/api', // Matches your Flask blueprint prefix
+  // baseURL: 'https://api.shahzadtradingcompany.com/api', // Matches your Flask blueprint prefix
 });
 
 // REQUEST Interceptor: Attach the token
@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  return config;
+  return config; 
 });
 
 // RESPONSE Interceptor: Handle the 401 "Expired" error

@@ -281,6 +281,12 @@ export interface AdminUsersResponse {
   total_pages: number;
 }
 
+export interface ToggleStatusResponse {
+  msg:          string;
+  user_id:      number;
+  is_confirmed: boolean;
+}
+
 export async function getAdminUsers(
   page     = 1,
   per_page = 20,
@@ -294,3 +300,32 @@ export async function getAdminUsers(
   const res = await api.get(`/admin/users?${params}`);
   return res.data;
 }
+
+// ── CHANGED: Added missing toggleUserStatus integration ──────────────────────
+export async function toggleUserStatus(userId: number | string): Promise<ToggleStatusResponse> {
+  const res = await api.patch(`/auth/admin/users/${userId}/toggle-status`);
+  return res.data;
+}
+
+export type UserPlanType = 'free' | 'starter' | 'pro' | 'agency' | 'trial' | 'admin';
+
+export interface UpdatePlanResponse {
+  msg: string;
+  user_id: number;
+  plan: UserPlanType;
+  is_pro: boolean;
+  is_free: boolean;
+  trial_expired: boolean;
+  trial_days_remaining: number;
+}
+
+export async function updateUserPlan(userId: number | string, plan: UserPlanType): Promise<UpdatePlanResponse> {
+  const res = await api.patch(`/auth/admin/users/${userId}/plan`, { plan });
+  return res.data;
+}
+
+// in authService.ts
+export const extendUserPlan = async (userId: number, days: number) => {
+  const res = await api.patch(`/auth/admin/users/${userId}/extend`, { days });
+  return res.data;
+};

@@ -1,45 +1,117 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,400..600&display=swap');
 @import "tailwindcss";
+
+/* ─── Theme tokens ──────────────────────────────────────────────────────── */
+/* Reference: warm cream surfaces, soft shadows, editorial serif headlines. */
 
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", serif;
   --font-body: "Inter", sans-serif;
+
+  /* Backgrounds */
+  --color-canvas: #faf9f6;       /* page background, light warm off-white */
+  --color-surface: #ffffff;      /* cards / panels */
+  --color-surface-sunk: #f3f1ec; /* recessed wells, inputs */
+  --color-surface-dark: #1c1a16; /* rare dark chips (e.g. active nav pill) */
+
+  /* Borders */
+  --color-line: #ece9e2;         /* hairline border, default */
+  --color-line-strong: #ddd9cf;  /* visible divider */
+
+  /* Text */
+  --color-ink: #1d1b17;          /* primary text */
+  --color-ink-soft: #4a463e;     /* secondary text */
+  --color-muted: #948d7f;        /* tertiary / labels */
+  --color-faint: #b8b2a3;        /* placeholders, disabled */
+
+  /* Accents */
+  --color-accent: #4f6f4a;       /* sage green — success, active states */
+  --color-accent-soft: #e3ecdd;  /* sage tint background */
+  --color-gold: #e8a84c;         /* warm gold — hero/feature gradient */
+  --color-gold-soft: #f6e6c4;
+  --color-rose: #c97b6e;         /* warm red-adjacent — destructive, alerts */
+  --color-rose-soft: #f3e3df;
+  --color-info: #5b7a9b;         /* soft blue — informational */
+  --color-info-soft: #e2eaf1;
+
+  /* Vivid blue — reserved for the homepage hero (lava-lamp blobs, CTA accents).
+     More saturated than --color-info, which stays muted for in-app badges. */
+  --color-vivid: #3b82c4;
+  --color-vivid-soft: #dbe9f5;
+
+  /* Extra sphere accents — homepage only, for the floating-sphere motif.
+     Saturated on purpose; these never appear in app chrome, only in the
+     decorative sphere device carried across the homepage. */
+  --color-violet: #8b5cf6;
+  --color-pink: #ec6f9b;
+  --color-amber-bright: #f5a623;
 }
 
 @layer base {
   body {
-    @apply bg-[#05060a] text-slate-400 antialiased;
+    @apply bg-[#faf9f6] text-[#4a463e] antialiased;
+    font-family: "Inter", ui-sans-serif, sans-serif;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
 }
 
 @layer components {
+
+  /* Diagonal canvas wash — mostly white with a touch of cool, slightly
+     bluish gray. Quiet and neutral, not warm; cards stay flat/white on top. */
+  .canvas-gradient {
+    background: linear-gradient(
+      135deg,
+      #f3f4f6 0%,
+      #f7f8f9 28%,
+      #fbfbfc 55%,
+      #ffffff 80%,
+      #ffffff 100%
+    );
+  }
+
+  /* Soft ambient wash behind the app — quiet, not a light show */
   .atmosphere {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: -1;
     overflow: hidden;
     pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 15% -10%, rgba(232, 168, 76, 0.10), transparent 60%),
+      radial-gradient(50% 40% at 100% 0%, rgba(91, 122, 155, 0.07), transparent 60%);
   }
 
   .atmosphere-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.15;
-    animation: blob-float 20s infinite alternate;
+    display: none; /* no neon blobs in the light theme */
   }
 
+  /* Card surface used throughout — soft elevation, not glass/glow */
   .glass-card {
-    @apply bg-white/[0.03] border border-white/10 backdrop-blur-xl;
+    @apply bg-[var(--color-surface)] border border-[var(--color-line)];
+    box-shadow: 0 1px 2px rgba(28, 26, 22, 0.04), 0 8px 24px -8px rgba(28, 26, 22, 0.06);
   }
 
+  /* Editorial headline treatment — the one signature flourish */
   .visionary-text {
-    @apply font-display tracking-tighter leading-[0.85] uppercase;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    color: var(--color-ink);
+    text-transform: none;
+  }
+
+  .eyebrow {
+    @apply text-[10px] font-bold uppercase tracking-[0.18em];
+    color: var(--color-muted);
+  }
+
+  .pill-nav-active {
+    @apply bg-[var(--color-surface)] border border-[var(--color-line-strong)];
+    box-shadow: 0 1px 2px rgba(28, 26, 22, 0.05);
   }
 }
 
@@ -54,12 +126,252 @@
   width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
+  background: var(--color-line-strong);
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: var(--color-muted);
+}
+
+/* ─── Discovery wizard motion ──────────────────────────────────────────── */
+/* The wizard's signature move is the "understanding panel" reflecting input
+   back as live tags + a reflection sentence — these keyframes support that,
+   not HUD/scan-line chrome. */
+
+@keyframes step-enter {
+  from { opacity: 0; transform: translateX(24px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes tag-pop {
+  from { opacity: 0; transform: translateY(4px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes think-dot {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Homepage hero: lava-lamp blobs + glass panel ────────────────────── */
+/* Blobs live inside the search-panel container only (not the page bg).
+   The panel sits on top with backdrop-blur so the blobs show through frosted
+   glass — classic glassmorphism over slow-moving color, contained to one
+   section rather than bleeding across the whole homepage. */
+
+@keyframes lava-drift-1 {
+  0%   { transform: translate(0%, 0%) scale(1);       border-radius: 42% 58% 65% 35% / 45% 45% 55% 55%; }
+  33%  { transform: translate(18%, -12%) scale(1.15);  border-radius: 58% 42% 40% 60% / 60% 35% 65% 40%; }
+  66%  { transform: translate(-10%, 14%) scale(0.9);   border-radius: 35% 65% 55% 45% / 40% 60% 40% 60%; }
+  100% { transform: translate(0%, 0%) scale(1);        border-radius: 42% 58% 65% 35% / 45% 45% 55% 55%; }
+}
+
+@keyframes lava-drift-2 {
+  0%   { transform: translate(0%, 0%) scale(1);        border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; }
+  40%  { transform: translate(-16%, 10%) scale(1.2);    border-radius: 40% 60% 65% 35% / 55% 40% 60% 45%; }
+  70%  { transform: translate(12%, -16%) scale(0.85);   border-radius: 55% 45% 40% 60% / 35% 65% 35% 65%; }
+  100% { transform: translate(0%, 0%) scale(1);         border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; }
+}
+
+@keyframes lava-drift-3 {
+  0%   { transform: translate(0%, 0%) scale(1);        border-radius: 50% 50% 45% 55% / 55% 45% 55% 45%; }
+  50%  { transform: translate(14%, 16%) scale(1.1);     border-radius: 35% 65% 60% 40% / 40% 60% 35% 65%; }
+  100% { transform: translate(0%, 0%) scale(1);         border-radius: 50% 50% 45% 55% / 55% 45% 55% 45%; }
+}
+
+.lava-blob {
+  position: absolute;
+  filter: blur(40px);
+  will-change: transform, border-radius;
+  pointer-events: none;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+/* ─── Iridescent gradient banner ───────────────────────────────────────── */
+/* The signature moment: a wide glassy, holographic ribbon gradient (blue →
+   violet → pink) that slowly shifts, like the Finay reference. This is the
+   one place we "spend boldness" — other sections stay quieter. */
+
+.iridescent-banner {
+  background: linear-gradient(
+    120deg,
+    #5b8fd9 0%,
+    #8b7ce8 22%,
+    #c08ce0 42%,
+    #e88cc4 58%,
+    #8b9fe8 76%,
+    #5b8fd9 100%
+  );
+  background-size: 200% 200%;
+  animation: iridescent-shift 16s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.iridescent-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 80% at 20% 30%, rgba(255,255,255,0.35), transparent 60%),
+    radial-gradient(50% 60% at 80% 70%, rgba(255,255,255,0.2), transparent 60%);
+  mix-blend-mode: overlay;
+}
+
+@keyframes iridescent-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── Dot-grid texture ──────────────────────────────────────────────────── */
+/* Subtle background texture for the Quso-style section. */
+
+.dot-grid {
+  background-image: radial-gradient(circle, var(--color-line-strong) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
+/* ─── Tilted card drift ─────────────────────────────────────────────────── */
+/* Floating mockup cards that gently rotate/bob, like Quso's angled panels. */
+
+@keyframes tilt-float-1 {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50%      { transform: rotate(-8deg) translateY(-10px); }
+}
+@keyframes tilt-float-2 {
+  0%, 100% { transform: rotate(5deg) translateY(0); }
+  50%      { transform: rotate(7deg) translateY(-8px); }
+}
+@keyframes tilt-float-3 {
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  50%      { transform: rotate(-1deg) translateY(8px); }
+}
+
+/* ─── Scroll-reveal ─────────────────────────────────────────────────────── */
+/* Applied via IntersectionObserver in components; class toggles opacity. */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── Discovery section: iridescent ring + connector system ────────────── */
+/* The ring needs to feel like the source the four signal cards emit from —
+   depth via layered glow, a slow dashed orbit ring behind it, and animated
+   connector lines with traveling light pulses tying card to ring. */
+
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes ring-spin-reverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.06); }
+}
+
+@keyframes connector-pulse {
+  0%   { stroke-dashoffset: 1; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-2%, 2%); }
+}
+
+/* ─── Roaming spheres (discovery section background) ──────────────────── */
+/* Glossy 3D-look orbs that drift slowly behind the signal cards, like the
+   reference's blue glass-panel hero. Each uses a radial-gradient + inset
+   shadow to fake dimensionality rather than a flat blurred blob. Scoped to
+   the discovery section only — not the whole page. */
+
+.roam-sphere {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes roam-drift-1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(5%, -8%) scale(1.04); }
+  50%  { transform: translate(-3%, -14%) scale(0.97); }
+  75%  { transform: translate(-7%, -4%) scale(1.02); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes roam-drift-2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  30%  { transform: translate(-6%, 7%) scale(1.05); }
+  60%  { transform: translate(4%, 12%) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes roam-drift-3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  40%  { transform: translate(8%, 5%) scale(1.06); }
+  70%  { transform: translate(3%, -9%) scale(0.96); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes leaf-sway {
+    0%, 100% { transform: rotate(-4deg) translateY(0); }
+    50%       { transform: rotate(4deg) translateY(-8px); }
+}
+@keyframes badge-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+@keyframes dot-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50%       { opacity: 0.65; transform: scale(1.08); }
+}
+@keyframes orb-hover {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50%       { transform: translateY(-12px) scale(1.03); }
+}
+@keyframes progress-in {
+    from { width: 0; }
+    to   { width: 83%; }
 }

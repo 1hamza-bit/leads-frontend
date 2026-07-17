@@ -72,8 +72,26 @@ const NeuralToast = ({ message, type = 'error', onRemove }: {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            className={`glass-card p-5 rounded-2xl border ${style.border} shadow-2xl flex items-start gap-4 min-w-[320px] max-w-md pointer-events-auto relative overflow-hidden`}
-        >
+            className={`
+    relative overflow-hidden
+    min-w-[340px] max-w-md
+    rounded-2xl
+    border
+    ${style.border}
+    bg-slate-900/95
+    backdrop-blur-2xl
+    shadow-[0_0_35px_rgba(0,0,0,0.55)]
+    flex items-start gap-4 p-5
+    pointer-events-auto
+`}
+            style={{
+                boxShadow:
+                    type === "success"
+                        ? "0 0 20px rgba(16,185,129,.35), 0 0 50px rgba(16,185,129,.15)"
+                        : type === "error"
+                            ? "0 0 20px rgba(239,68,68,.35), 0 0 50px rgba(239,68,68,.15)"
+                            : "0 0 20px rgba(99,102,241,.35), 0 0 50px rgba(99,102,241,.15)"
+            }}        >
             <div className={`w-10 h-10 ${style.bg} rounded-xl flex items-center justify-center ${style.text} shrink-0`}>
                 {style.icon}
             </div>
@@ -102,10 +120,10 @@ const NeuralToast = ({ message, type = 'error', onRemove }: {
 };
 
 const LoginInput = ({ onLogin, initialMode = 'login' }: LoginInputProps) => {
-    const [email, setEmail]       = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
-    const [mode, setMode]         = useState<'login' | 'register'>(initialMode);
+    const [mode, setMode] = useState<'login' | 'register'>(initialMode);
     const [isLoading, setIsLoading] = useState(false);
 
     // ── CHANGED: typed as ToastState | null instead of string ────────────────
@@ -276,9 +294,8 @@ const LoginInput = ({ onLogin, initialMode = 'login' }: LoginInputProps) => {
                             <button
                                 key={tab}
                                 onClick={() => setMode(tab)}
-                                className={`flex-1 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative ${
-                                    mode === tab ? 'text-white' : 'text-slate-600 hover:text-slate-400'
-                                }`}
+                                className={`flex-1 py-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative ${mode === tab ? 'text-white' : 'text-slate-600 hover:text-slate-400'
+                                    }`}
                             >
                                 {tab === 'login' ? 'Login' : 'Sign Up'}
                                 {mode === tab && (
@@ -338,8 +355,8 @@ const LoginInput = ({ onLogin, initialMode = 'login' }: LoginInputProps) => {
                             {isLoading ? (
                                 <>
                                     <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                                     </svg>
                                     {mode === 'login' ? 'Authenticating...' : 'Creating account...'}
                                 </>
@@ -367,11 +384,11 @@ const LoginInput = ({ onLogin, initialMode = 'login' }: LoginInputProps) => {
                                 className="flex items-center justify-center gap-3 bg-white/[0.02] border border-white/10 py-4 rounded-xl text-white font-bold text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all disabled:opacity-50"
                             >
                                 <svg className="w-4 h-4" viewBox="0 0 24 24">
-                                    <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.273 0 3.191 2.727 1.227 6.709l4.039 3.056z"/>
-                                    <path fill="#FBBC05" d="M1.227 6.709L5.266 9.765a7.075 7.075 0 0 1 0 4.47l-4.039 3.056c-.773-1.573-1.227-3.327-1.227-5.182 0-1.854.454-3.609 1.227-5.182z"/>
-                                    <path fill="#4285F4" d="M12 24c3.127 0 5.728-1.036 7.636-2.809l-3.9-3.018c-1.045.7-2.382 1.109-3.736 1.109-2.882 0-5.327-1.945-6.2-4.564l-4.039 3.056C3.191 21.273 7.273 24 12 24z"/>
-                                    <path fill="#34A853" d="M17.764 16.173A7.077 7.077 0 0 1 12 19.091c-2.882 0-5.327-1.945-6.2-4.564l-4.039 3.056C3.191 21.273 7.273 24 12 24c3.127 0 5.728-1.036 7.636-2.809l-3.9-3.018z"/>
-                                    <path fill="#4285F4" d="M23.491 9.5c.345 1.5.509 3.045.509 4.5 0 1.5-.164 3-.509 4.5H12V9.5h11.491z"/>
+                                    <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.273 0 3.191 2.727 1.227 6.709l4.039 3.056z" />
+                                    <path fill="#FBBC05" d="M1.227 6.709L5.266 9.765a7.075 7.075 0 0 1 0 4.47l-4.039 3.056c-.773-1.573-1.227-3.327-1.227-5.182 0-1.854.454-3.609 1.227-5.182z" />
+                                    <path fill="#4285F4" d="M12 24c3.127 0 5.728-1.036 7.636-2.809l-3.9-3.018c-1.045.7-2.382 1.109-3.736 1.109-2.882 0-5.327-1.945-6.2-4.564l-4.039 3.056C3.191 21.273 7.273 24 12 24z" />
+                                    <path fill="#34A853" d="M17.764 16.173A7.077 7.077 0 0 1 12 19.091c-2.882 0-5.327-1.945-6.2-4.564l-4.039 3.056C3.191 21.273 7.273 24 12 24c3.127 0 5.728-1.036 7.636-2.809l-3.9-3.018z" />
+                                    <path fill="#4285F4" d="M23.491 9.5c.345 1.5.509 3.045.509 4.5 0 1.5-.164 3-.509 4.5H12V9.5h11.491z" />
                                 </svg>
                                 Google
                             </button>
